@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"errors"
 	"flag"
 	"fmt"
@@ -19,6 +20,15 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
+
+//go:embed file.template.html
+var fileTemplateHtml string
+
+//go:embed files.template.html
+var filesTemplateHtml string
+
+//go:embed log.template.html
+var logTemplateHtml string
 
 var (
 	config Config
@@ -207,7 +217,8 @@ func CloneAndInfo() *git.Repository {
 }
 
 func BuildLogPage(r *git.Repository) {
-	t, err := template.ParseFiles("log.template.html")
+	t, err := template.New("log").Parse(logTemplateHtml)
+	checkErr(err)
 	commits := make([]GshrCommit, 0)
 	ref, err := r.Head()
 	checkErr(err)
@@ -233,7 +244,8 @@ func BuildLogPage(r *git.Repository) {
 }
 
 func BuildFilesPages() {
-	t, err := template.ParseFiles("files.template.html")
+	t, err := template.New("files").Parse(filesTemplateHtml)
+	checkErr(err)
 	trackedFiles := make([]TrackedFileMetaData, 0)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
@@ -264,9 +276,8 @@ func BuildFilesPages() {
 }
 
 func BuildSingleFilePages() {
-	t, err := template.ParseFiles("file.template.html")
+	t, err := template.New("file").Parse(fileTemplateHtml)
 	checkErr(err)
-
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
