@@ -19,10 +19,13 @@ cloning:
 clean:
 	rm -rf target/*
 
-dev: target output cloning
-	OUTPUT_DIR=$(PWD)/target/output && \
-    CLONING_DIR=$(PWD)/target/cloning && \
-    go run main.go && \
-    cp styles.css OUTPUT_DIR=$(PWD)/target/output/ && \
-    cd OUTPUT_DIR=$(PWD)/target/output && \
+target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin:
+	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin main.go
+
+dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
+	OUTPUT_DIR=$(PWD)/target/output \
+    CLONING_DIR=$(PWD)/target/cloning \
+    ./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin && \
+    cp styles.css $(PWD)/target/output/ && \
+    cd $(PWD)/target/output && \
     python3 -m http.server 8000

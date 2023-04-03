@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -31,6 +31,9 @@ var (
 func main() {
 	outputDir = os.Getenv("OUTPUT_DIR")
 	cloningDir = os.Getenv("CLONING_DIR")
+	line("OUTPUT_DIR = %v", outputDir)
+	line("CLONING_DIR = %v", cloningDir)
+	cloneAndCheck()
 	primaryScan()
 }
 
@@ -47,7 +50,7 @@ func writeFile(filename string, outputFile string, t *template.Template) {
 	checkErr(err)
 }
 
-func primaryScan() {
+func cloneAndCheck() {
 	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
 		URL: "/Users/bvogt/dev/src/ben/www",
 	})
@@ -65,6 +68,9 @@ func primaryScan() {
 	})
 	checkErr(err)
 
+}
+
+func primaryScan() {
 	t, err := template.ParseFiles("template.html")
 	checkErr(err)
 
