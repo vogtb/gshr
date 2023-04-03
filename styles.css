@@ -344,16 +344,6 @@ div.content pre {
   border-radius: 4px;
 }
 
-div.content code {
-  padding: 2px;
-}
-
-div.content code::before,
-div.content code::after {
-  letter-spacing: -0.2em;
-  content: "\00a0"
-}
-
 div.content pre>code {
   padding: 0;
   background-color: transparent;

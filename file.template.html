@@ -46,7 +46,11 @@
       </table>
     </div>
     <div class="file">
+      {{ if .CanRender }}
       {{ .Content }}
+      {{ else }}
+      Cannot preview file with extension <code>{{ .Extension }}</code>
+      {{ end }}
     </div>
   </div>
 </body>

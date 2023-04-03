@@ -112,6 +112,8 @@ type TrackedFile struct {
 	Name           string
 	Size           string
 	Origin         string
+	Extension      string
+	CanRender      bool
 	Destination    string
 	DestinationDir string
 	Content        template.HTML
@@ -128,24 +130,27 @@ func (f *TrackedFile) SaveTemplate(t *template.Template) {
 	}
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
-	fileBytes, err := os.ReadFile(f.Origin)
-	checkErr(err)
-	fileStr := string(fileBytes)
-	iterator, err := lexer.Tokenise(nil, fileStr)
-	formatter := html.New(
-		html.WithClasses(true),
-		html.WithLineNumbers(true),
-		html.LinkableLineNumbers(true, ""),
-	)
-	s := ""
-	buf := bytes.NewBufferString(s)
-	err = formatter.Format(buf, style, iterator)
-	checkErr(err)
+	_, canRender := config.TextExtensions[f.Extension]
+	if canRender {
+		fileBytes, err := os.ReadFile(f.Origin)
+		checkErr(err)
+		fileStr := string(fileBytes)
+		iterator, err := lexer.Tokenise(nil, fileStr)
+		formatter := html.New(
+			html.WithClasses(true),
+			html.WithLineNumbers(true),
+			html.LinkableLineNumbers(true, ""),
+		)
+		s := ""
+		buf := bytes.NewBufferString(s)
+		err = formatter.Format(buf, style, iterator)
+		checkErr(err)
+		f.Content = template.HTML(buf.String())
+	}
 	err = os.MkdirAll(filepath.Dir(f.Destination), 0775)
 	checkErr(err)
 	output, err := os.Create(f.Destination)
 	checkErr(err)
-	f.Content = template.HTML(buf.String())
 	err = t.Execute(output, f)
 	checkErr(err)
 }
@@ -221,20 +226,17 @@ func BuildFilesPages() {
 		}
 
 		if !info.IsDir() {
-			ext := filepath.Ext(filename)
-			if _, ok := config.TextExtensions[ext]; ok {
-				info, err := os.Stat(filename)
-				checkErr(err)
-				Name, _ := strings.CutPrefix(filename, config.CloneDir)
-				Name, _ = strings.CutPrefix(Name, "/")
-				tf := TrackedFileMetaData{
-					Origin: filename,
-					Name:   Name,
-					Mode:   info.Mode().String(),
-					Size:   fmt.Sprintf("%v", info.Size()),
-				}
-				trackedFiles = append(trackedFiles, tf)
+			info, err := os.Stat(filename)
+			checkErr(err)
+			Name, _ := strings.CutPrefix(filename, config.CloneDir)
+			Name, _ = strings.CutPrefix(Name, "/")
+			tf := TrackedFileMetaData{
+				Origin: filename,
+				Name:   Name,
+				Mode:   info.Mode().String(),
+				Size:   fmt.Sprintf("%v", info.Size()),
 			}
+			trackedFiles = append(trackedFiles, tf)
 		}
 		return nil
 	})
@@ -256,17 +258,18 @@ func BuildSingleFilePages() {
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			if _, ok := config.TextExtensions[ext]; ok {
-				partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
-				outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
-				debug("reading = %v", partialPath)
-				tf := TrackedFile{
-					Origin:         filename,
-					Destination:    outputName,
-					DestinationDir: path.Join(config.OutputDir, "files", partialPath),
-				}
-				tf.SaveTemplate(t)
+			_, canRender := config.TextExtensions[ext]
+			partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
+			outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
+			debug("reading = %v", partialPath)
+			tf := TrackedFile{
+				Extension:      ext,
+				CanRender:      canRender,
+				Origin:         filename,
+				Destination:    outputName,
+				DestinationDir: path.Join(config.OutputDir, "files", partialPath),
 			}
+			tf.SaveTemplate(t)
 		}
 		return nil
 	})
