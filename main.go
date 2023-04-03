@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/fs"
+	"math/rand"
 	"os"
 	"path"
 	"path/filepath"
@@ -17,21 +19,61 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-var allowedExtensions = map[string]bool{
-	".md":   true,
-	".txt":  true,
-	".html": true,
-	".css":  true,
-	".js":   true,
-	".toml": true,
-	".json": true,
-	".lock": true,
-}
-
 var (
-	outputDir  = ""
-	cloningDir = ""
+	debugOn        = true
+	outputDir      = ""
+	cloningDir     = ""
+	textExtensions = map[string]bool{
+		".conf":       true,
+		".config":     true,
+		".css":        true,
+		".gitignore":  true,
+		".gitmodules": true,
+		".go":         true,
+		".htm":        true,
+		".html":       true,
+		".iml":        true,
+		".js":         true,
+		".json":       true,
+		".jsx":        true,
+		".less":       true,
+		".lock":       true,
+		".log":        true,
+		".Makefile":   true,
+		".md":         true,
+		".mod":        true,
+		".php":        true,
+		".py":         true,
+		".rb":         true,
+		".rs":         true,
+		".scss":       true,
+		".sum":        true,
+		".toml":       true,
+		".ts":         true,
+		".tsx":        true,
+		".txt":        true,
+		".xml":        true,
+		"Makefile":    true,
+	}
 )
+
+func main() {
+	flag.BoolVar(&debugOn, "debug", true, "debug mode")
+	flag.StringVar(&outputDir, "output", "", "clone directory")
+	flag.StringVar(&cloningDir, "clone", "", "clone directory")
+	flag.Parse()
+
+	if cloningDir == "" {
+		cloningDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
+	}
+
+	debug("output = %v", outputDir)
+	debug("clone = %v", cloningDir)
+	r := CloneAndInfo()
+	BuildLogPage(r)
+	BuildFilesPages()
+	BuildSingleFilePages()
+}
 
 type TrackedFileMetaData struct {
 	Mode   string
@@ -112,17 +154,6 @@ func (fi *FilesIndex) SaveTemplate(t *template.Template) {
 	checkErr(err)
 }
 
-func main() {
-	outputDir = os.Getenv("OUTPUT_DIR")
-	cloningDir = os.Getenv("CLONING_DIR")
-	line("OUTPUT_DIR = %v", outputDir)
-	line("CLONING_DIR = %v", cloningDir)
-	r := CloneAndInfo()
-	BuildLogPage(r)
-	BuildFilesPages()
-	BuildSingleFilePages()
-}
-
 func CloneAndInfo() *git.Repository {
 	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
 		URL: "/Users/bvogt/dev/src/ben/www",
@@ -140,7 +171,6 @@ func BuildLogPage(r *git.Repository) {
 	checkErr(err)
 
 	err = cIter.ForEach(func(c *object.Commit) error {
-		fmt.Println(c)
 		commits = append(commits, GshrCommit{
 			Author:  c.Author.Email,
 			Message: c.Message,
@@ -167,7 +197,7 @@ func BuildFilesPages() {
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			if _, ok := allowedExtensions[ext]; ok {
+			if _, ok := textExtensions[ext]; ok {
 				info, err := os.Stat(filename)
 				checkErr(err)
 				Name, _ := strings.CutPrefix(filename, cloningDir)
@@ -201,11 +231,10 @@ func BuildSingleFilePages() {
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			if _, ok := allowedExtensions[ext]; ok {
+			if _, ok := textExtensions[ext]; ok {
 				partialPath, _ := strings.CutPrefix(filename, cloningDir)
 				outputName := path.Join(outputDir, "files", partialPath, "index.html")
-				line("READING: %v", filename)
-				line("WRITING: %v", outputName)
+				debug("reading = %v", partialPath)
 				tf := TrackedFile{
 					Origin:         filename,
 					Destination:    outputName,
@@ -226,7 +255,9 @@ func checkErr(err error) {
 	}
 }
 
-func line(format string, a ...any) {
-	fmt.Printf(format, a...)
-	fmt.Print("\n")
+func debug(format string, a ...any) {
+	if debugOn {
+		fmt.Printf(format, a...)
+		fmt.Print("\n")
+	}
 }
