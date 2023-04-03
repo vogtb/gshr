@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -9,6 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/alecthomas/chroma/formatters/html"
+	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
@@ -43,19 +47,35 @@ type TrackedFile struct {
 	Origin         string
 	Destination    string
 	DestinationDir string
+	Content        template.HTML
 }
 
-func (tf *TrackedFile) SaveTemplate(t *template.Template) {
-	err := os.MkdirAll(tf.DestinationDir, 0775)
+func (f *TrackedFile) SaveTemplate(t *template.Template) {
+	lexer := lexers.Match(f.Destination)
+	if lexer == nil {
+		lexer = lexers.Fallback
+	}
+	style := styles.Get("fruity")
+	if style == nil {
+		style = styles.Fallback
+	}
+	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
-	fileBytes, err := os.ReadFile(tf.Origin)
+	fileBytes, err := os.ReadFile(f.Origin)
 	checkErr(err)
 	fileStr := string(fileBytes)
-	err = os.MkdirAll(filepath.Dir(tf.Destination), 0775)
+	iterator, err := lexer.Tokenise(nil, fileStr)
+	formatter := html.New(html.WithClasses(true))
+	s := ""
+	buf := bytes.NewBufferString(s)
+	err = formatter.Format(buf, style, iterator)
 	checkErr(err)
-	output, err := os.Create(tf.Destination)
+	err = os.MkdirAll(filepath.Dir(f.Destination), 0775)
 	checkErr(err)
-	err = t.Execute(output, fileStr)
+	output, err := os.Create(f.Destination)
+	checkErr(err)
+	f.Content = template.HTML(buf.String())
+	err = t.Execute(output, f)
 	checkErr(err)
 }
 
@@ -152,7 +172,7 @@ func BuildFilesPages() {
 					Origin: filename,
 					Name:   Name,
 					Mode:   info.Mode().String(),
-					Size:   fmt.Sprintf("%v bytes", info.Size()),
+					Size:   fmt.Sprintf("%v", info.Size()),
 				}
 				trackedFiles = append(trackedFiles, tf)
 			}
