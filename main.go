@@ -29,18 +29,28 @@ var (
 	cloningDir = ""
 )
 
+type TrackedFileMetaData struct {
+	Mode   string
+	Name   string
+	Size   string
+	Origin string
+}
+
 type TrackedFile struct {
-	origin      string
-	destination string
+	Mode        string
+	Name        string
+	Size        string
+	Origin      string
+	Destination string
 }
 
 func (tf *TrackedFile) SaveTemplate(t *template.Template) {
-	fileBytes, err := os.ReadFile(tf.origin)
+	fileBytes, err := os.ReadFile(tf.Origin)
 	checkErr(err)
 	fileStr := string(fileBytes)
-	err = os.MkdirAll(filepath.Dir(tf.destination), 0775)
+	err = os.MkdirAll(filepath.Dir(tf.Destination), 0775)
 	checkErr(err)
-	output, err := os.Create(tf.destination)
+	output, err := os.Create(tf.Destination)
 	checkErr(err)
 	err = t.Execute(output, fileStr)
 	checkErr(err)
@@ -64,6 +74,19 @@ func (mi *MainIndex) SaveTemplate(t *template.Template) {
 	checkErr(err)
 }
 
+type FilesIndex struct {
+	Files []TrackedFileMetaData
+}
+
+func (fi *FilesIndex) SaveTemplate(t *template.Template) {
+	err := os.MkdirAll(path.Join(outputDir, "files"), 0775)
+	checkErr(err)
+	output, err := os.Create(path.Join(outputDir, "files", "index.html"))
+	checkErr(err)
+	err = t.Execute(output, fi)
+	checkErr(err)
+}
+
 func main() {
 	outputDir = os.Getenv("OUTPUT_DIR")
 	cloningDir = os.Getenv("CLONING_DIR")
@@ -71,6 +94,7 @@ func main() {
 	line("CLONING_DIR = %v", cloningDir)
 	r := CloneAndInfo()
 	BuildMainIndex(r)
+	BuildFilesIndex()
 	BuildTrackedFiles()
 }
 
@@ -106,7 +130,39 @@ func BuildMainIndex(r *git.Repository) {
 		Commits: commits,
 	}
 	m.SaveTemplate(t)
+}
 
+func BuildFilesIndex() {
+	t, err := template.ParseFiles("files.template.html")
+	trackedFiles := make([]TrackedFileMetaData, 0)
+	err = filepath.Walk(cloningDir, func(filename string, info fs.FileInfo, err error) error {
+		if info.IsDir() && info.Name() == ".git" {
+			return filepath.SkipDir
+		}
+
+		if !info.IsDir() {
+			ext := filepath.Ext(filename)
+			if _, ok := allowedExtensions[ext]; ok {
+				info, err := os.Stat(filename)
+				checkErr(err)
+				Name, _ := strings.CutPrefix(filename, cloningDir)
+				Name, _ = strings.CutPrefix(Name, "/")
+				tf := TrackedFileMetaData{
+					Origin: filename,
+					Name:   Name,
+					Mode:   info.Mode().String(),
+					Size:   fmt.Sprintf("%v bytes", info.Size()),
+				}
+				trackedFiles = append(trackedFiles, tf)
+			}
+		}
+		return nil
+	})
+	checkErr(err)
+	index := FilesIndex{
+		Files: trackedFiles,
+	}
+	index.SaveTemplate(t)
 }
 
 func BuildTrackedFiles() {
@@ -126,8 +182,8 @@ func BuildTrackedFiles() {
 				line("READING: %v", filename)
 				line("WRITING: %v", outputName)
 				tf := TrackedFile{
-					origin:      filename,
-					destination: outputName,
+					Origin:      filename,
+					Destination: outputName,
 				}
 				tf.SaveTemplate(t)
 			}

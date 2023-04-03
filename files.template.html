@@ -22,23 +22,17 @@
       <table id="log">
         <thead>
           <tr>
-            <td><b>Date</b></td>
-            <td><b>Commit message</b></td>
-            <td><b>Author</b></td>
-            <td align="right"><b>Files</b></td>
-            <td align="right"><b>+</b></td>
-            <td align="right"><b>-</b></td>
+            <td><b>Mode</b></td>
+            <td><b>Name</b></td>
+            <td><b>Size</b></td>
           </tr>
         </thead>
         <tbody>
-          {{ range .Commits }}
+          {{ range .Files }}
           <tr>
-            <td>{{ .Date }}</td>
-            <td><a href="commit/{{ .Hash }}">{{ .Message }}</a></td>
-            <td>{{ .Author }}</td>
-            <td align="right">1</td>
-            <td align="right">+2</td>
-            <td align="right">-0</td>
+            <td>{{ .Mode }}</td>
+            <td><a href="files/{{ .Name }}/index.html">{{ .Name }}</a></td>
+            <td>{{ .Size }}</td>
           </tr>
           {{ end }}
         </tbody>

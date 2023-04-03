@@ -411,6 +411,10 @@ div.content div.commits table {
   width: 100%;
 }
 
+div.content div.commits table td {
+  padding: 0 0.4em;
+}
+
 div.content div.commits table tr:hover {
   background: #efefef;
 }
