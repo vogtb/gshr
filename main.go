@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -21,6 +22,7 @@ import (
 
 var (
 	debugOn        = true
+	repo           = ""
 	outputDir      = ""
 	cloningDir     = ""
 	textExtensions = map[string]bool{
@@ -58,10 +60,15 @@ var (
 )
 
 func main() {
-	flag.BoolVar(&debugOn, "debug", true, "debug mode")
-	flag.StringVar(&outputDir, "output", "", "clone directory")
-	flag.StringVar(&cloningDir, "clone", "", "clone directory")
+	flag.StringVar(&repo, "repo", "", "Repo to use.")
+	flag.BoolVar(&debugOn, "debug", true, "Run in debug mode.")
+	flag.StringVar(&outputDir, "output", "", "Directory of output.")
+	flag.StringVar(&cloningDir, "clone", "", "Directory to clone into. Random directory in /tmp if omitted.")
 	flag.Parse()
+
+	if repo == "" {
+		checkErr(errors.New("--repo flag is required"))
+	}
 
 	if cloningDir == "" {
 		cloningDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
@@ -156,7 +163,7 @@ func (fi *FilesIndex) SaveTemplate(t *template.Template) {
 
 func CloneAndInfo() *git.Repository {
 	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
-		URL: "/Users/bvogt/dev/src/ben/www",
+		URL: repo,
 	})
 	checkErr(err)
 	return r
@@ -250,7 +257,7 @@ func BuildSingleFilePages() {
 
 func checkErr(err error) {
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
 }

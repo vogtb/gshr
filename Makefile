@@ -24,8 +24,10 @@ target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin:
 
 dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
+    --repo=/Users/bvogt/dev/src/ben/www \
     --output=$(PWD)/target/output \
-    --clone=$(PWD)/target/cloning && \
+    --clone=$(PWD)/target/cloning \
+		&& \
     cp styles.css $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
