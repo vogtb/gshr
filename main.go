@@ -116,16 +116,9 @@ func main() {
 	debug("clone = %v", config.CloneDir)
 	debug("base-url = %v", config.BaseURL)
 	r := CloneAndInfo()
-	BuildLogPage(r)
-	BuildFilesPages()
-	BuildSingleFilePages()
-}
-
-type TrackedFileMetaData struct {
-	Mode   string
-	Name   string
-	Size   string
-	Origin string
+	RenderLogPage(r)
+	RenderAllFilesPage()
+	RenderSingleFilePages()
 }
 
 type TrackedFile struct {
@@ -141,7 +134,7 @@ type TrackedFile struct {
 	Content        template.HTML
 }
 
-func (f *TrackedFile) SaveTemplate(t *template.Template) {
+func (f *TrackedFile) Render(t *template.Template) {
 	lexer := lexers.Match(f.DestinationDir)
 	if lexer == nil {
 		lexer = lexers.Fallback
@@ -177,23 +170,31 @@ func (f *TrackedFile) SaveTemplate(t *template.Template) {
 	checkErr(err)
 }
 
-type GshrCommit struct {
-	Author  string
-	Date    string
-	Hash    string
-	Message string
+type Commit struct {
+	Author          string
+	Date            string
+	Hash            string
+	Message         string
+	FileChangeCount int
 }
 
 type LogPage struct {
 	BaseURL string
-	Commits []GshrCommit
+	Commits []Commit
 }
 
-func (mi *LogPage) SaveTemplate(t *template.Template) {
+func (mi *LogPage) Render(t *template.Template) {
 	output, err := os.Create(path.Join(config.OutputDir, "log.html"))
 	checkErr(err)
 	err = t.Execute(output, mi)
 	checkErr(err)
+}
+
+type TrackedFileMetaData struct {
+	Mode   string
+	Name   string
+	Size   string
+	Origin string
 }
 
 type FilesIndex struct {
@@ -201,7 +202,7 @@ type FilesIndex struct {
 	Files   []TrackedFileMetaData
 }
 
-func (fi *FilesIndex) SaveTemplate(t *template.Template) {
+func (fi *FilesIndex) Render(t *template.Template) {
 	output, err := os.Create(path.Join(config.OutputDir, "files.html"))
 	checkErr(err)
 	err = t.Execute(output, fi)
@@ -216,21 +217,24 @@ func CloneAndInfo() *git.Repository {
 	return r
 }
 
-func BuildLogPage(r *git.Repository) {
+func RenderLogPage(r *git.Repository) {
 	t, err := template.New("log").Parse(logTemplateHtml)
 	checkErr(err)
-	commits := make([]GshrCommit, 0)
+	commits := make([]Commit, 0)
 	ref, err := r.Head()
 	checkErr(err)
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
 	checkErr(err)
 
 	err = cIter.ForEach(func(c *object.Commit) error {
-		commits = append(commits, GshrCommit{
-			Author:  c.Author.Name,
-			Message: c.Message,
-			Date:    c.Author.When.UTC().Format("2006-01-02 15:04:05"),
-			Hash:    c.Hash.String(),
+		stats, err := c.Stats()
+		checkErr(err)
+		commits = append(commits, Commit{
+			Author:          c.Author.Name,
+			Message:         c.Message,
+			Date:            c.Author.When.UTC().Format("2006-01-02 15:04:05"),
+			Hash:            c.Hash.String(),
+			FileChangeCount: len(stats),
 		})
 		return nil
 	})
@@ -240,10 +244,10 @@ func BuildLogPage(r *git.Repository) {
 		BaseURL: config.BaseURL,
 		Commits: commits,
 	}
-	m.SaveTemplate(t)
+	m.Render(t)
 }
 
-func BuildFilesPages() {
+func RenderAllFilesPage() {
 	t, err := template.New("files").Parse(filesTemplateHtml)
 	checkErr(err)
 	trackedFiles := make([]TrackedFileMetaData, 0)
@@ -272,10 +276,10 @@ func BuildFilesPages() {
 		BaseURL: config.BaseURL,
 		Files:   trackedFiles,
 	}
-	index.SaveTemplate(t)
+	index.Render(t)
 }
 
-func BuildSingleFilePages() {
+func RenderSingleFilePages() {
 	t, err := template.New("file").Parse(fileTemplateHtml)
 	checkErr(err)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
@@ -297,7 +301,7 @@ func BuildSingleFilePages() {
 				Destination:    outputName,
 				DestinationDir: path.Join(config.OutputDir, "files", partialPath),
 			}
-			tf.SaveTemplate(t)
+			tf.Render(t)
 		}
 		return nil
 	})
