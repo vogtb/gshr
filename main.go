@@ -122,7 +122,7 @@ func (f *TrackedFile) SaveTemplate(t *template.Template) {
 	if lexer == nil {
 		lexer = lexers.Fallback
 	}
-	style := styles.Get("fruity")
+	style := styles.Get("borland")
 	if style == nil {
 		style = styles.Fallback
 	}

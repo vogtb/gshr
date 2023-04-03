@@ -24,7 +24,7 @@ target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin:
 
 dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
-    --repo=/Users/bvogt/dev/src/ben/www \
+    --repo=/Users/bvogt/dev/src/ben/gshr \
     --output=$(PWD)/target/output \
     --clone=$(PWD)/target/cloning \
 		&& \
