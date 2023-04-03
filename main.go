@@ -176,6 +176,8 @@ type Commit struct {
 	Hash            string
 	Message         string
 	FileChangeCount int
+	LinesAdded      int
+	LinesDeleted    int
 }
 
 type LogPage struct {
@@ -228,6 +230,13 @@ func RenderLogPage(r *git.Repository) {
 
 	err = cIter.ForEach(func(c *object.Commit) error {
 		stats, err := c.Stats()
+		added := 0
+		deleted := 0
+		for i := 0; i < len(stats); i++ {
+			stat := stats[i]
+			added += stat.Addition
+			deleted += stat.Deletion
+		}
 		checkErr(err)
 		commits = append(commits, Commit{
 			Author:          c.Author.Name,
@@ -235,6 +244,8 @@ func RenderLogPage(r *git.Repository) {
 			Date:            c.Author.When.UTC().Format("2006-01-02 15:04:05"),
 			Hash:            c.Hash.String(),
 			FileChangeCount: len(stats),
+			LinesAdded:      added,
+			LinesDeleted:    deleted,
 		})
 		return nil
 	})

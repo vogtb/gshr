@@ -64,8 +64,8 @@
             <td class="commit"><a href="commit/{{ .Hash }}">{{ .Message }}</a></td>
             <td>{{ .Author }}</td>
             <td align="right">{{ .FileChangeCount }}</td>
-            <td align="right">+2</td>
-            <td align="right">-0</td>
+            <td align="right">+{{ .LinesAdded }}</td>
+            <td align="right">-{{ .LinesDeleted }}</td>
           </tr>
           {{ end }}
         </tbody>
