@@ -21,61 +21,79 @@ import (
 )
 
 var (
-	debugOn        = true
-	repo           = ""
-	outputDir      = ""
-	cloningDir     = ""
-	textExtensions = map[string]bool{
-		".conf":       true,
-		".config":     true,
-		".css":        true,
-		".gitignore":  true,
-		".gitmodules": true,
-		".go":         true,
-		".htm":        true,
-		".html":       true,
-		".iml":        true,
-		".js":         true,
-		".json":       true,
-		".jsx":        true,
-		".less":       true,
-		".lock":       true,
-		".log":        true,
-		".Makefile":   true,
-		".md":         true,
-		".mod":        true,
-		".php":        true,
-		".py":         true,
-		".rb":         true,
-		".rs":         true,
-		".scss":       true,
-		".sum":        true,
-		".toml":       true,
-		".ts":         true,
-		".tsx":        true,
-		".txt":        true,
-		".xml":        true,
-		"Makefile":    true,
-	}
+	config Config
 )
 
+type Config struct {
+	DebugOn        bool
+	Repo           string
+	OutputDir      string
+	CloneDir       string
+	TextExtensions map[string]bool
+}
+
+func DefaultConfig() Config {
+	return Config{
+		DebugOn:   true,
+		Repo:      "",
+		OutputDir: "",
+		CloneDir:  fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32()),
+		TextExtensions: map[string]bool{
+			".c":          true,
+			".cc":         true,
+			".conf":       true,
+			".config":     true,
+			".cpp":        true,
+			".css":        true,
+			".gitignore":  true,
+			".gitmodules": true,
+			".go":         true,
+			".h":          true,
+			".htm":        true,
+			".html":       true,
+			".iml":        true,
+			".js":         true,
+			".json":       true,
+			".jsx":        true,
+			".less":       true,
+			".lock":       true,
+			".log":        true,
+			".Makefile":   true,
+			".md":         true,
+			".mod":        true,
+			".php":        true,
+			".py":         true,
+			".rb":         true,
+			".rs":         true,
+			".scss":       true,
+			".sql":        true,
+			".sum":        true,
+			".toml":       true,
+			".ts":         true,
+			".tsx":        true,
+			".txt":        true,
+			".xml":        true,
+			".yaml":       true,
+			".yml":        true,
+			"Makefile":    true,
+		},
+	}
+}
+
 func main() {
-	flag.StringVar(&repo, "repo", "", "Repo to use.")
-	flag.BoolVar(&debugOn, "debug", true, "Run in debug mode.")
-	flag.StringVar(&outputDir, "output", "", "Directory of output.")
-	flag.StringVar(&cloningDir, "clone", "", "Directory to clone into. Random directory in /tmp if omitted.")
+	config = DefaultConfig()
+	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
+	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
+	flag.StringVar(&config.OutputDir, "output", "", "Directory of output.")
+	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Random directory in /tmp if omitted.")
 	flag.Parse()
 
-	if repo == "" {
+	if config.Repo == "" {
 		checkErr(errors.New("--repo flag is required"))
 	}
 
-	if cloningDir == "" {
-		cloningDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
-	}
-
-	debug("output = %v", outputDir)
-	debug("clone = %v", cloningDir)
+	debug("output = %v", config.OutputDir)
+	debug("clone = %v", config.CloneDir)
 	r := CloneAndInfo()
 	BuildLogPage(r)
 	BuildFilesPages()
@@ -144,7 +162,7 @@ type LogPage struct {
 }
 
 func (mi *LogPage) SaveTemplate(t *template.Template) {
-	output, err := os.Create(path.Join(outputDir, "log.html"))
+	output, err := os.Create(path.Join(config.OutputDir, "log.html"))
 	checkErr(err)
 	err = t.Execute(output, mi)
 	checkErr(err)
@@ -155,15 +173,15 @@ type FilesIndex struct {
 }
 
 func (fi *FilesIndex) SaveTemplate(t *template.Template) {
-	output, err := os.Create(path.Join(outputDir, "files.html"))
+	output, err := os.Create(path.Join(config.OutputDir, "files.html"))
 	checkErr(err)
 	err = t.Execute(output, fi)
 	checkErr(err)
 }
 
 func CloneAndInfo() *git.Repository {
-	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
-		URL: repo,
+	r, err := git.PlainClone(config.CloneDir, false, &git.CloneOptions{
+		URL: config.Repo,
 	})
 	checkErr(err)
 	return r
@@ -197,17 +215,17 @@ func BuildLogPage(r *git.Repository) {
 func BuildFilesPages() {
 	t, err := template.ParseFiles("files.template.html")
 	trackedFiles := make([]TrackedFileMetaData, 0)
-	err = filepath.Walk(cloningDir, func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			if _, ok := textExtensions[ext]; ok {
+			if _, ok := config.TextExtensions[ext]; ok {
 				info, err := os.Stat(filename)
 				checkErr(err)
-				Name, _ := strings.CutPrefix(filename, cloningDir)
+				Name, _ := strings.CutPrefix(filename, config.CloneDir)
 				Name, _ = strings.CutPrefix(Name, "/")
 				tf := TrackedFileMetaData{
 					Origin: filename,
@@ -231,21 +249,21 @@ func BuildSingleFilePages() {
 	t, err := template.ParseFiles("file.template.html")
 	checkErr(err)
 
-	err = filepath.Walk(cloningDir, func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			if _, ok := textExtensions[ext]; ok {
-				partialPath, _ := strings.CutPrefix(filename, cloningDir)
-				outputName := path.Join(outputDir, "files", partialPath, "index.html")
+			if _, ok := config.TextExtensions[ext]; ok {
+				partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
+				outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
 				debug("reading = %v", partialPath)
 				tf := TrackedFile{
 					Origin:         filename,
 					Destination:    outputName,
-					DestinationDir: path.Join(outputDir, "files", partialPath),
+					DestinationDir: path.Join(config.OutputDir, "files", partialPath),
 				}
 				tf.SaveTemplate(t)
 			}
@@ -263,7 +281,7 @@ func checkErr(err error) {
 }
 
 func debug(format string, a ...any) {
-	if debugOn {
+	if config.DebugOn {
 		fmt.Printf(format, a...)
 		fmt.Print("\n")
 	}
