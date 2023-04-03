@@ -402,38 +402,17 @@ div.content img.img-responsive {
   height: auto
 }
 
-.workspace {
-  border-radius: 3px;
-  background: #4ae1f5;
-  padding: 1em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  color: black
+div.content div.commits {
+  display: block;
+  font-family: var(--mono-font);
 }
 
-.ideas {
-  border-radius: 3px;
-  background: #efc51c;
-  padding: 1em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  color: black
+div.content div.commits table {
+  width: 100%;
 }
 
-.reading-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between
-}
-
-.reading-container .book {
-  flex: 0 48%
-}
-
-@media (max-width: 480px) {
-  .reading-container .book {
-    flex: 0 100%;
-  }
+div.content div.commits table tr:hover {
+  background: #efefef;
 }
 
 .chroma {

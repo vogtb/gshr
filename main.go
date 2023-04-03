@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -28,29 +29,34 @@ var (
 	cloningDir = ""
 )
 
-func main() {
-	outputDir = os.Getenv("OUTPUT_DIR")
-	cloningDir = os.Getenv("CLONING_DIR")
-	line("OUTPUT_DIR = %v", outputDir)
-	line("CLONING_DIR = %v", cloningDir)
-	cloneAndCheck()
-	primaryScan()
+type TrackedFile struct {
+	origin      string
+	destination string
 }
 
-func writeFile(filename string, outputFile string, t *template.Template) {
-	fileBytes, err := os.ReadFile(filename)
+func (tf *TrackedFile) SaveTemplate(t *template.Template) {
+	fileBytes, err := os.ReadFile(tf.origin)
 	checkErr(err)
 	fileStr := string(fileBytes)
-	filepath.Dir(outputFile)
-	err = os.MkdirAll(filepath.Dir(outputFile), 0775)
+	err = os.MkdirAll(filepath.Dir(tf.destination), 0775)
 	checkErr(err)
-	output, err := os.Create(outputFile)
+	output, err := os.Create(tf.destination)
 	checkErr(err)
 	err = t.Execute(output, fileStr)
 	checkErr(err)
 }
 
-func cloneAndCheck() {
+func main() {
+	outputDir = os.Getenv("OUTPUT_DIR")
+	cloningDir = os.Getenv("CLONING_DIR")
+	line("OUTPUT_DIR = %v", outputDir)
+	line("CLONING_DIR = %v", cloningDir)
+	CloneAndInfo()
+	BuildTrackedFiles()
+	BuildMainIndex()
+}
+
+func CloneAndInfo() {
 	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
 		URL: "/Users/bvogt/dev/src/ben/www",
 	})
@@ -70,8 +76,16 @@ func cloneAndCheck() {
 
 }
 
-func primaryScan() {
-	t, err := template.ParseFiles("template.html")
+func BuildMainIndex() {
+	t, err := template.ParseFiles("index.template.html")
+	checkErr(err)
+	output, err := os.Create(path.Join(outputDir, "index.html"))
+	err = t.Execute(output, "")
+	checkErr(err)
+}
+
+func BuildTrackedFiles() {
+	t, err := template.ParseFiles("file.template.html")
 	checkErr(err)
 
 	err = filepath.Walk(cloningDir, func(filename string, info fs.FileInfo, err error) error {
@@ -81,12 +95,16 @@ func primaryScan() {
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			line("READING: %v", filename)
 			if _, ok := allowedExtensions[ext]; ok {
 				partialPath, _ := strings.CutPrefix(filename, cloningDir)
 				outputName := fmt.Sprintf("%v%v.html", outputDir, partialPath)
+				line("READING: %v", filename)
 				line("WRITING: %v", outputName)
-				writeFile(filename, outputName, t)
+				tf := TrackedFile{
+					origin:      filename,
+					destination: outputName,
+				}
+				tf.SaveTemplate(t)
 			}
 		}
 		return nil
