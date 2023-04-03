@@ -46,42 +46,67 @@ func (tf *TrackedFile) SaveTemplate(t *template.Template) {
 	checkErr(err)
 }
 
+type GshrCommit struct {
+	Author  string
+	Date    string
+	Hash    string
+	Message string
+}
+
+type MainIndex struct {
+	Commits []GshrCommit
+}
+
+func (mi *MainIndex) SaveTemplate(t *template.Template) {
+	output, err := os.Create(path.Join(outputDir, "index.html"))
+	checkErr(err)
+	err = t.Execute(output, mi)
+	checkErr(err)
+}
+
 func main() {
 	outputDir = os.Getenv("OUTPUT_DIR")
 	cloningDir = os.Getenv("CLONING_DIR")
 	line("OUTPUT_DIR = %v", outputDir)
 	line("CLONING_DIR = %v", cloningDir)
-	CloneAndInfo()
+	r := CloneAndInfo()
+	BuildMainIndex(r)
 	BuildTrackedFiles()
-	BuildMainIndex()
 }
 
-func CloneAndInfo() {
+func CloneAndInfo() *git.Repository {
 	r, err := git.PlainClone(cloningDir, false, &git.CloneOptions{
 		URL: "/Users/bvogt/dev/src/ben/www",
 	})
 	checkErr(err)
+	return r
+}
 
+func BuildMainIndex(r *git.Repository) {
+	t, err := template.ParseFiles("index.template.html")
+	commits := make([]GshrCommit, 0)
 	ref, err := r.Head()
 	checkErr(err)
-
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
 	checkErr(err)
 
 	err = cIter.ForEach(func(c *object.Commit) error {
 		fmt.Println(c)
+		commits = append(commits, GshrCommit{
+			Author:  c.Author.Email,
+			Message: c.Message,
+			Date:    c.Author.When.UTC().Format("2006-01-02 15:04:05"),
+			Hash:    c.Hash.String(),
+		})
 		return nil
 	})
-	checkErr(err)
 
-}
+	checkErr(err)
+	m := MainIndex{
+		Commits: commits,
+	}
+	m.SaveTemplate(t)
 
-func BuildMainIndex() {
-	t, err := template.ParseFiles("index.template.html")
-	checkErr(err)
-	output, err := os.Create(path.Join(outputDir, "index.html"))
-	err = t.Execute(output, "")
-	checkErr(err)
 }
 
 func BuildTrackedFiles() {

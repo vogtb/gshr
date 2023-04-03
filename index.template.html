@@ -31,7 +31,17 @@
           </tr>
         </thead>
         <tbody>
+          {{ range .Commits }}
           <tr>
+            <td>{{ .Date }}</td>
+            <td><a href="commit/{{ .Hash }}">{{ .Message }}</a></td>
+            <td>{{ .Author }}</td>
+            <td align="right">1</td>
+            <td align="right">+2</td>
+            <td align="right">-0</td>
+          </tr>
+          {{ end }}
+          <!-- <tr>
             <td>2020-03-04 11:03</td>
             <td><a href="commit/commit_hash.html">update TODO</a></td>
             <td>benjvogt</td>
@@ -54,7 +64,7 @@
             <td align="right">1</td>
             <td align="right">+2</td>
             <td align="right">-3</td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
     </div>
