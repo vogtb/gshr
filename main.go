@@ -51,7 +51,7 @@ type TrackedFile struct {
 }
 
 func (f *TrackedFile) SaveTemplate(t *template.Template) {
-	lexer := lexers.Match(f.Destination)
+	lexer := lexers.Match(f.DestinationDir)
 	if lexer == nil {
 		lexer = lexers.Fallback
 	}
@@ -65,7 +65,11 @@ func (f *TrackedFile) SaveTemplate(t *template.Template) {
 	checkErr(err)
 	fileStr := string(fileBytes)
 	iterator, err := lexer.Tokenise(nil, fileStr)
-	formatter := html.New(html.WithClasses(true))
+	formatter := html.New(
+		html.WithClasses(true),
+		html.WithLineNumbers(true),
+		html.LinkableLineNumbers(true, ""),
+	)
 	s := ""
 	buf := bytes.NewBufferString(s)
 	err = formatter.Format(buf, style, iterator)

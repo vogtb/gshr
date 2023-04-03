@@ -13,6 +13,7 @@
   --font-size: 13px;
   --font-family: var(--sans-font);
   /* Dark/light theme variables. */
+  --bg: white;
   --text-color: black;
   --second-text-color: #838181;
   --link-color: var(--blue);
