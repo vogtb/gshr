@@ -202,7 +202,7 @@ func BuildLogPage(r *git.Repository) {
 
 	err = cIter.ForEach(func(c *object.Commit) error {
 		commits = append(commits, GshrCommit{
-			Author:  c.Author.Email,
+			Author:  c.Author.Name,
 			Message: c.Message,
 			Date:    c.Author.When.UTC().Format("2006-01-02 15:04:05"),
 			Hash:    c.Hash.String(),

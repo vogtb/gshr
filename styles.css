@@ -219,7 +219,7 @@ nav:hover ul {
 }
 
 .main-header {
-  max-width: 880px;
+  max-width: 860px;
   min-width: 100px;
   padding-left: 20px;
   padding-right: 20px;
@@ -271,7 +271,7 @@ nav ul li a[href]:hover {
 @media screen and (max-width: 920px) {
   .main-header {
     margin: 0 auto;
-    max-width: 880px;
+    max-width: 860px;
     padding-left: 20px;
     padding-right: 20px;
     position: relative;
@@ -290,13 +290,7 @@ nav ul li a[href]:hover {
 div.content {
   margin: 0 auto;
   padding: 40px 20px;
-  max-width: 880px
-}
-
-div.content a[href] {
-  overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto
+  max-width: 860px
 }
 
 div.content:not(.sub) h1:first-child {
@@ -370,6 +364,12 @@ div.content div.metadata h1 {
 }
 
 
+div.content div.log .commit {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
 div.content div.log {
   display: block;
 }
@@ -382,12 +382,13 @@ div.content div.files table {
   font-family: var(--mono-font);
 }
 
-div.content>*>tr:hover {
+div.content * tr:hover {
   background: #efefef;
 }
 
-div.content>*>td {
+div.content * td {
   padding: 0 0.4em;
+  max-width: 380px;
 }
 
 .chroma {
@@ -578,27 +579,27 @@ div.content>*>td {
 }
 
 .chroma .c {
-  color: #008800;
+  color: #006800;
   font-style: italic
 }
 
 .chroma .ch {
-  color: #008800;
+  color: #006800;
   font-style: italic
 }
 
 .chroma .cm {
-  color: #008800;
+  color: #006800;
   font-style: italic
 }
 
 .chroma .c1 {
-  color: #008800;
+  color: #006800;
   font-style: italic
 }
 
 .chroma .cs {
-  color: #008800;
+  color: #006800;
   font-weight: bold
 }
 

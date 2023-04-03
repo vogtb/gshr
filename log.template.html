@@ -61,7 +61,7 @@
           {{ range .Commits }}
           <tr>
             <td>{{ .Date }}</td>
-            <td><a href="commit/{{ .Hash }}">{{ .Message }}</a></td>
+            <td class="commit"><a href="commit/{{ .Hash }}">{{ .Message }}</a></td>
             <td>{{ .Author }}</td>
             <td align="right">1</td>
             <td align="right">+2</td>
