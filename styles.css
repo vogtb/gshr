@@ -65,7 +65,7 @@ pre,
 blockquote,
 hr,
 object {
-  margin: 1rem 0
+  margin: 0.31rem 0
 }
 
 pre,
@@ -335,24 +335,19 @@ div.content blockquote {
   font-size: 1.1em
 }
 
+div.content div.file {
+  padding: 0 0.4em;
+}
+
 div.content pre,
 div.content code {
   color: var(--code-color);
   background-color: var(--code-bg);
-  border-radius: 3px
-}
-
-div.content pre>code {
-  background: none;
-  border-radius: 0;
-  color: var(--code-color)
 }
 
 div.content pre {
-  line-height: 1.21;
   overflow-x: auto;
-  padding: 16px;
-  border: var(--code-border-color) solid 1px;
+  padding: 1em;
   background: var(--code-bg);
   color: var(--text-color)
 }
@@ -384,39 +379,34 @@ div.content *:target {
   outline: 4px solid #fe0
 }
 
-div.content center {
-  margin: 2em 0;
-  user-select: none;
-  cursor: default;
-  color: var(--text-color)
+div.content div.metadata {
+  padding-bottom: 1em;
 }
 
-div.content.sub {
-  margin-top: -50px;
-  padding-top: 20px
+div.content div.metadata h1 {
+  font-size: 1em;
+  margin: 0;
 }
 
-div.content img.img-responsive {
+
+div.content div.log {
   display: block;
-  max-width: 100%;
-  height: auto
 }
 
-div.content div.commits {
-  display: block;
+div.content div.log table,
+div.content div.files table {
+  vertical-align: top;
+  white-space: nowrap;
+  width: 100%;
   font-family: var(--mono-font);
 }
 
-div.content div.commits table {
-  width: 100%;
-}
-
-div.content div.commits table td {
-  padding: 0 0.4em;
-}
-
-div.content div.commits table tr:hover {
+div.content>*>tr:hover {
   background: #efefef;
+}
+
+div.content>*>td {
+  padding: 0 0.4em;
 }
 
 .chroma {

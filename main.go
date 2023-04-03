@@ -37,14 +37,17 @@ type TrackedFileMetaData struct {
 }
 
 type TrackedFile struct {
-	Mode        string
-	Name        string
-	Size        string
-	Origin      string
-	Destination string
+	Mode           string
+	Name           string
+	Size           string
+	Origin         string
+	Destination    string
+	DestinationDir string
 }
 
 func (tf *TrackedFile) SaveTemplate(t *template.Template) {
+	err := os.MkdirAll(tf.DestinationDir, 0775)
+	checkErr(err)
 	fileBytes, err := os.ReadFile(tf.Origin)
 	checkErr(err)
 	fileStr := string(fileBytes)
@@ -63,12 +66,12 @@ type GshrCommit struct {
 	Message string
 }
 
-type MainIndex struct {
+type LogPage struct {
 	Commits []GshrCommit
 }
 
-func (mi *MainIndex) SaveTemplate(t *template.Template) {
-	output, err := os.Create(path.Join(outputDir, "index.html"))
+func (mi *LogPage) SaveTemplate(t *template.Template) {
+	output, err := os.Create(path.Join(outputDir, "log.html"))
 	checkErr(err)
 	err = t.Execute(output, mi)
 	checkErr(err)
@@ -79,9 +82,7 @@ type FilesIndex struct {
 }
 
 func (fi *FilesIndex) SaveTemplate(t *template.Template) {
-	err := os.MkdirAll(path.Join(outputDir, "files"), 0775)
-	checkErr(err)
-	output, err := os.Create(path.Join(outputDir, "files", "index.html"))
+	output, err := os.Create(path.Join(outputDir, "files.html"))
 	checkErr(err)
 	err = t.Execute(output, fi)
 	checkErr(err)
@@ -93,9 +94,9 @@ func main() {
 	line("OUTPUT_DIR = %v", outputDir)
 	line("CLONING_DIR = %v", cloningDir)
 	r := CloneAndInfo()
-	BuildMainIndex(r)
-	BuildFilesIndex()
-	BuildTrackedFiles()
+	BuildLogPage(r)
+	BuildFilesPages()
+	BuildSingleFilePages()
 }
 
 func CloneAndInfo() *git.Repository {
@@ -106,8 +107,8 @@ func CloneAndInfo() *git.Repository {
 	return r
 }
 
-func BuildMainIndex(r *git.Repository) {
-	t, err := template.ParseFiles("index.template.html")
+func BuildLogPage(r *git.Repository) {
+	t, err := template.ParseFiles("log.template.html")
 	commits := make([]GshrCommit, 0)
 	ref, err := r.Head()
 	checkErr(err)
@@ -126,13 +127,13 @@ func BuildMainIndex(r *git.Repository) {
 	})
 
 	checkErr(err)
-	m := MainIndex{
+	m := LogPage{
 		Commits: commits,
 	}
 	m.SaveTemplate(t)
 }
 
-func BuildFilesIndex() {
+func BuildFilesPages() {
 	t, err := template.ParseFiles("files.template.html")
 	trackedFiles := make([]TrackedFileMetaData, 0)
 	err = filepath.Walk(cloningDir, func(filename string, info fs.FileInfo, err error) error {
@@ -165,7 +166,7 @@ func BuildFilesIndex() {
 	index.SaveTemplate(t)
 }
 
-func BuildTrackedFiles() {
+func BuildSingleFilePages() {
 	t, err := template.ParseFiles("file.template.html")
 	checkErr(err)
 
@@ -178,12 +179,13 @@ func BuildTrackedFiles() {
 			ext := filepath.Ext(filename)
 			if _, ok := allowedExtensions[ext]; ok {
 				partialPath, _ := strings.CutPrefix(filename, cloningDir)
-				outputName := fmt.Sprintf("%v%v.html", outputDir, partialPath)
+				outputName := path.Join(outputDir, "files", partialPath, "index.html")
 				line("READING: %v", filename)
 				line("WRITING: %v", outputName)
 				tf := TrackedFile{
-					Origin:      filename,
-					Destination: outputName,
+					Origin:         filename,
+					Destination:    outputName,
+					DestinationDir: path.Join(outputDir, "files", partialPath),
 				}
 				tf.SaveTemplate(t)
 			}
