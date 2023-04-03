@@ -28,6 +28,6 @@ dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
     --output=$(PWD)/target/output \
     --clone=$(PWD)/target/cloning \
 		&& \
-    cp styles.css $(PWD)/target/output/ && \
+    cp gshr.css $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000

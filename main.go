@@ -29,6 +29,7 @@ type Config struct {
 	Repo           string
 	OutputDir      string
 	CloneDir       string
+	BaseURL        string
 	TextExtensions map[string]bool
 }
 
@@ -37,7 +38,8 @@ func DefaultConfig() Config {
 		DebugOn:   true,
 		Repo:      "",
 		OutputDir: "",
-		CloneDir:  fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32()),
+		BaseURL:   "/",
+		CloneDir:  "",
 		TextExtensions: map[string]bool{
 			".c":          true,
 			".cc":         true,
@@ -86,14 +88,23 @@ func main() {
 	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
 	flag.StringVar(&config.OutputDir, "output", "", "Directory of output.")
 	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Random directory in /tmp if omitted.")
+	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for loading styles.")
 	flag.Parse()
 
 	if config.Repo == "" {
 		checkErr(errors.New("--repo flag is required"))
 	}
 
+	if config.CloneDir == "" {
+		config.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
+	}
+
+	config.BaseURL = path.Join(config.BaseURL, "/")
+
+	debug("repo = %v", config.Repo)
 	debug("output = %v", config.OutputDir)
 	debug("clone = %v", config.CloneDir)
+	debug("base-url = %v", config.BaseURL)
 	r := CloneAndInfo()
 	BuildLogPage(r)
 	BuildFilesPages()
@@ -108,6 +119,7 @@ type TrackedFileMetaData struct {
 }
 
 type TrackedFile struct {
+	BaseURL        string
 	Mode           string
 	Name           string
 	Size           string
@@ -163,6 +175,7 @@ type GshrCommit struct {
 }
 
 type LogPage struct {
+	BaseURL string
 	Commits []GshrCommit
 }
 
@@ -174,7 +187,8 @@ func (mi *LogPage) SaveTemplate(t *template.Template) {
 }
 
 type FilesIndex struct {
-	Files []TrackedFileMetaData
+	BaseURL string
+	Files   []TrackedFileMetaData
 }
 
 func (fi *FilesIndex) SaveTemplate(t *template.Template) {
@@ -212,6 +226,7 @@ func BuildLogPage(r *git.Repository) {
 
 	checkErr(err)
 	m := LogPage{
+		BaseURL: config.BaseURL,
 		Commits: commits,
 	}
 	m.SaveTemplate(t)
@@ -242,7 +257,8 @@ func BuildFilesPages() {
 	})
 	checkErr(err)
 	index := FilesIndex{
-		Files: trackedFiles,
+		BaseURL: config.BaseURL,
+		Files:   trackedFiles,
 	}
 	index.SaveTemplate(t)
 }
@@ -263,6 +279,7 @@ func BuildSingleFilePages() {
 			outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
 			debug("reading = %v", partialPath)
 			tf := TrackedFile{
+				BaseURL:        config.BaseURL,
 				Extension:      ext,
 				CanRender:      canRender,
 				Origin:         filename,
