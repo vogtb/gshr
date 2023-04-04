@@ -1,17 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"html/template"
 	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
-
-	"github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
 )
 
 type FilePage struct {
@@ -28,31 +23,15 @@ type FilePage struct {
 }
 
 func (f *FilePage) Render(t *template.Template) {
-	lexer := lexers.Match(f.DestinationDir)
-	if lexer == nil {
-		lexer = lexers.Fallback
-	}
-	style := styles.Get("borland")
-	if style == nil {
-		style = styles.Fallback
-	}
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
 	if f.CanRender {
 		fileBytes, err := os.ReadFile(f.Origin)
 		checkErr(err)
 		fileStr := string(fileBytes)
-		iterator, err := lexer.Tokenise(nil, fileStr)
-		formatter := html.New(
-			html.WithClasses(true),
-			html.WithLineNumbers(true),
-			html.LinkableLineNumbers(true, ""),
-		)
-		s := ""
-		buf := bytes.NewBufferString(s)
-		err = formatter.Format(buf, style, iterator)
+		highlighted := highlight(f.DestinationDir, &fileStr)
 		checkErr(err)
-		f.Content = template.HTML(buf.String())
+		f.Content = template.HTML(highlighted)
 	}
 	err = os.MkdirAll(filepath.Dir(f.Destination), 0775)
 	checkErr(err)

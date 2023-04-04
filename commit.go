@@ -1,15 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"html/template"
 	"os"
 	"path"
 
-	"github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
@@ -58,28 +54,13 @@ func RenderAllCommitPages(r *git.Repository) {
 		filesChangedMap := make(map[string]bool)
 		filesChanged := []string{}
 		if parent != nil {
-			lexer := lexers.Match("x.diff")
-			if lexer == nil {
-				lexer = lexers.Fallback
-			}
-			style := styles.Get("borland")
-			if style == nil {
-				style = styles.Fallback
-			}
+
 			patch, err := c.Patch(parent)
 			checkErr(err)
 			patchString := patch.String()
-			iterator, err := lexer.Tokenise(nil, patchString)
-			formatter := html.New(
-				html.WithClasses(true),
-				html.WithLineNumbers(true),
-				html.LinkableLineNumbers(true, ""),
-			)
-			s := ""
-			buf := bytes.NewBufferString(s)
-			err = formatter.Format(buf, style, iterator)
+			highlighted := highlight("x.diff", &patchString)
 			checkErr(err)
-			diffContent = template.HTML(buf.String())
+			diffContent = template.HTML(highlighted)
 			for _, fp := range patch.FilePatches() {
 				from, to := fp.Files()
 				if from != nil {

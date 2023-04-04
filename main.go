@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	_ "embed"
 	"errors"
@@ -10,6 +11,10 @@ import (
 	"os"
 	"path"
 
+	"github.com/alecthomas/chroma"
+	"github.com/alecthomas/chroma/formatters/html"
+	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -153,4 +158,30 @@ func debug(format string, a ...any) {
 		fmt.Printf(format, a...)
 		fmt.Print("\n")
 	}
+}
+
+func syntaxHighlightTools(pathOrExtension string) (chroma.Lexer, *chroma.Style, *html.Formatter) {
+	lexer := lexers.Match(pathOrExtension)
+	if lexer == nil {
+		lexer = lexers.Fallback
+	}
+	style := styles.Get("borland")
+	if style == nil {
+		style = styles.Fallback
+	}
+	formatter := html.New(
+		html.WithClasses(true),
+		html.WithLineNumbers(true),
+		html.LinkableLineNumbers(true, ""),
+	)
+	return lexer, style, formatter
+}
+
+func highlight(pathOrExtension string, data *string) string {
+	lexer, style, formatter := syntaxHighlightTools(pathOrExtension)
+	iterator, err := lexer.Tokenise(nil, *data)
+	buf := bytes.NewBufferString("")
+	err = formatter.Format(buf, style, iterator)
+	checkErr(err)
+	return buf.String()
 }
