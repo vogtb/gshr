@@ -24,8 +24,7 @@ target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin: Makefile target $(wildcard *.go)
 
 dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
-    --name="gshr" \
-    --desc="git static host repo -- generates static html for repo" \
+    --desc="git static host repo -- generates static html for repos" \
     --repo=/Users/bvogt/dev/src/ben/gshr \
     --git-url="git@git.vogt.world:vogtb/gshr.git" \
     --output=$(PWD)/target/output \

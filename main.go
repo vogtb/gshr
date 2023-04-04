@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
@@ -41,7 +40,6 @@ func Init() {
 	flag.StringVar(&config.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
 	flag.StringVar(&config.RepoData.BaseURL, "base-url", "/", "Base URL for serving.")
 	flag.StringVar(&config.RepoData.GitURL, "git-url", "", "Show where repo is hosted.")
-	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name to show")
 	flag.StringVar(&config.RepoData.Description, "desc", "<no description>", "Description to show.")
 	flag.Parse()
 
@@ -54,6 +52,7 @@ func Init() {
 	}
 
 	config.RepoData.BaseURL = path.Join(config.RepoData.BaseURL, "/")
+	config.RepoData.Name = path.Clean(path.Base(config.Repo))
 
 	debug("repo = %v", config.Repo)
 	debug("output = %v", config.OutputDir)
@@ -85,7 +84,7 @@ func debug(format string, a ...any) {
 	}
 }
 
-func syntaxHighlightTools(pathOrExtension string) (chroma.Lexer, *chroma.Style, *html.Formatter) {
+func highlight(pathOrExtension string, data *string) string {
 	lexer := lexers.Match(pathOrExtension)
 	if lexer == nil {
 		lexer = lexers.Fallback
@@ -99,11 +98,6 @@ func syntaxHighlightTools(pathOrExtension string) (chroma.Lexer, *chroma.Style, 
 		html.WithLineNumbers(true),
 		html.LinkableLineNumbers(true, ""),
 	)
-	return lexer, style, formatter
-}
-
-func highlight(pathOrExtension string, data *string) string {
-	lexer, style, formatter := syntaxHighlightTools(pathOrExtension)
 	iterator, err := lexer.Tokenise(nil, *data)
 	buf := bytes.NewBufferString("")
 	err = formatter.Format(buf, style, iterator)
