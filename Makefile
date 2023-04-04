@@ -20,7 +20,7 @@ clean:
 	rm -rf target/*
 
 target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin:
-	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin main.go
+	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin $(wildcard *.go)
 
 dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
