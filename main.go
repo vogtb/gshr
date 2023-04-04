@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	_ "embed"
 	"errors"
 	"flag"
@@ -21,21 +22,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-//go:embed file.template.html
-var fileTemplateHtml string
+//go:embed templates/*
+var htmlTemplates embed.FS
 
-//go:embed files.template.html
-var filesTemplateHtml string
-
-//go:embed log.template.html
-var logTemplateHtml string
-
-//go:embed commit.template.html
-var commitTemplateHtml string
-
-var (
-	config Config
-)
+var config Config
 
 type Config struct {
 	DebugOn        bool
@@ -258,7 +248,7 @@ func CloneAndInfo() *git.Repository {
 }
 
 func RenderAllCommitPages(r *git.Repository) {
-	t, err := template.New("commit").Parse(commitTemplateHtml)
+	t, err := template.ParseFS(htmlTemplates, "templates/commit.html")
 	checkErr(err)
 	ref, err := r.Head()
 	checkErr(err)
@@ -292,7 +282,7 @@ func RenderAllCommitPages(r *git.Repository) {
 }
 
 func RenderLogPage(r *git.Repository) {
-	t, err := template.New("log").Parse(logTemplateHtml)
+	t, err := template.ParseFS(htmlTemplates, "templates/log.html")
 	checkErr(err)
 	commits := make([]Commit, 0)
 	ref, err := r.Head()
@@ -332,7 +322,7 @@ func RenderLogPage(r *git.Repository) {
 }
 
 func RenderAllFilesPage() {
-	t, err := template.New("files").Parse(filesTemplateHtml)
+	t, err := template.ParseFS(htmlTemplates, "templates/files.html")
 	checkErr(err)
 	trackedFiles := make([]TrackedFileMetaData, 0)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
@@ -365,7 +355,7 @@ func RenderAllFilesPage() {
 }
 
 func RenderSingleFilePages() {
-	t, err := template.New("file").Parse(fileTemplateHtml)
+	t, err := template.ParseFS(htmlTemplates, "templates/file.html")
 	checkErr(err)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
