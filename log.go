@@ -20,8 +20,10 @@ type LogPageCommit struct {
 }
 
 type LogPage struct {
-	RepoData RepoData
-	Commits  []LogPageCommit
+	RepoData   RepoData
+	HasReadMe  bool
+	ReadMePath string
+	Commits    []LogPageCommit
 }
 
 func (mi *LogPage) Render(t *template.Template) {
@@ -39,7 +41,6 @@ func RenderLogPage(r *git.Repository) {
 	checkErr(err)
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
 	checkErr(err)
-
 	err = cIter.ForEach(func(c *object.Commit) error {
 		stats, err := c.Stats()
 		added := 0
@@ -61,7 +62,6 @@ func RenderLogPage(r *git.Repository) {
 		})
 		return nil
 	})
-
 	checkErr(err)
 	(&LogPage{
 		RepoData: config.RepoData,

@@ -35,6 +35,18 @@
           <a href="{{ .BaseURL }}log.html">Log</a>
           |
           <a href="{{ .BaseURL }}files.html">Files</a>
+          {{ if .HasReadMe }}
+          |
+          <a href="{{ .BaseURL }}files/{{ .ReadMePath }}/index.html">
+            {{ .ReadMePath }}
+          </a>
+          {{ end }}
+          {{ if .HasLicenseFile }}
+          |
+          <a href="{{ .BaseURL }}files/{{ .LicenseFilePath }}/index.html">
+            {{ .LicenseFilePath }}
+          </a>
+          {{ end }}
         </td>
       </tr>
     </tbody>

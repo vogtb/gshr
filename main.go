@@ -99,10 +99,14 @@ func DefaultConfig() Config {
 }
 
 type RepoData struct {
-	Name        string
-	GitURL      string
-	Description string
-	BaseURL     string
+	Name            string
+	GitURL          string
+	Description     string
+	BaseURL         string
+	HasReadMe       bool
+	ReadMePath      string
+	HasLicenseFile  bool
+	LicenseFilePath string
 }
 
 func main() {
@@ -132,6 +136,10 @@ func main() {
 	debug("clone = %v", config.CloneDir)
 	debug("base-url = %v", config.BaseURL)
 	r := CloneAndInfo()
+	config.RepoData.ReadMePath = getReadmePath()
+	config.RepoData.HasReadMe = config.RepoData.ReadMePath != ""
+	config.RepoData.LicenseFilePath = getLicenseFilePath()
+	config.RepoData.HasLicenseFile = config.RepoData.LicenseFilePath != ""
 	RenderLogPage(r)
 	RenderAllCommitPages(r)
 	RenderAllFilesPage()
@@ -184,4 +192,36 @@ func highlight(pathOrExtension string, data *string) string {
 	err = formatter.Format(buf, style, iterator)
 	checkErr(err)
 	return buf.String()
+}
+
+func getReadmePath() string {
+	for _, file := range []string{
+		"readme.md",
+		"README.md",
+		"readme.txt",
+		"README.txt",
+		"README",
+	} {
+		if stat, err := os.Stat(path.Join(config.CloneDir, file)); err == nil {
+			return stat.Name()
+		}
+	}
+	return ""
+}
+
+func getLicenseFilePath() string {
+	for _, file := range []string{
+		"license-mit",
+		"LICENSE-MIT",
+		"license.md",
+		"LICENSE.md",
+		"license.txt",
+		"LICENSE.txt",
+		"LICENSE",
+	} {
+		if stat, err := os.Stat(path.Join(config.CloneDir, file)); err == nil {
+			return stat.Name()
+		}
+	}
+	return ""
 }
