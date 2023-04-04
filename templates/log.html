@@ -2,49 +2,12 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>gshr</title>
-  <link rel="stylesheet" href="{{ .BaseURL }}gshr.css" type="text/css">
-  <meta name="description"
-        content="git static host repo">
-  <meta property="og:site_name" content="gshr">
-  <meta property="og:type" content="article">
-  <meta property="article:author" content="gshr">
+  {{ template "head" . }}
 </head>
 
 <body>
   <div class="content">
-    <div class="metadata">
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <h1>www</h1>
-              <span class="desc">
-                personal website hosted at https:://www.vogt.world/
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              git clone
-              <a href="git@git.vogt.world:./www.gitc">git@git.vogt.world:./www.git</a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="{{ .BaseURL }}log.html">Log</a>
-              |
-              <a href="{{ .BaseURL }}files.html">Files</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    {{ template "metadata" . }}
     <div class="log">
       <table>
         <thead>

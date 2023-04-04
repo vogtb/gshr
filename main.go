@@ -248,7 +248,7 @@ func CloneAndInfo() *git.Repository {
 }
 
 func RenderAllCommitPages(r *git.Repository) {
-	t, err := template.ParseFS(htmlTemplates, "templates/commit.html")
+	t, err := template.ParseFS(htmlTemplates, "templates/commit.html", "templates/partials.html")
 	checkErr(err)
 	ref, err := r.Head()
 	checkErr(err)
@@ -282,7 +282,7 @@ func RenderAllCommitPages(r *git.Repository) {
 }
 
 func RenderLogPage(r *git.Repository) {
-	t, err := template.ParseFS(htmlTemplates, "templates/log.html")
+	t, err := template.ParseFS(htmlTemplates, "templates/log.html", "templates/partials.html")
 	checkErr(err)
 	commits := make([]Commit, 0)
 	ref, err := r.Head()
@@ -322,7 +322,7 @@ func RenderLogPage(r *git.Repository) {
 }
 
 func RenderAllFilesPage() {
-	t, err := template.ParseFS(htmlTemplates, "templates/files.html")
+	t, err := template.ParseFS(htmlTemplates, "templates/files.html", "templates/partials.html")
 	checkErr(err)
 	trackedFiles := make([]TrackedFileMetaData, 0)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
@@ -355,7 +355,7 @@ func RenderAllFilesPage() {
 }
 
 func RenderSingleFilePages() {
-	t, err := template.ParseFS(htmlTemplates, "templates/file.html")
+	t, err := template.ParseFS(htmlTemplates, "templates/file.html", "templates/partials.html")
 	checkErr(err)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
