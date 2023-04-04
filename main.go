@@ -44,6 +44,7 @@ type Config struct {
 	CloneDir       string
 	BaseURL        string
 	TextExtensions map[string]bool
+	PlainFiles     map[string]bool
 }
 
 func DefaultConfig() Config {
@@ -59,7 +60,10 @@ func DefaultConfig() Config {
 			".conf":       true,
 			".config":     true,
 			".cpp":        true,
+			".cs":         true,
 			".css":        true,
+			".csv":        true,
+			".Dockerfile": true,
 			".gitignore":  true,
 			".gitmodules": true,
 			".go":         true,
@@ -83,14 +87,22 @@ func DefaultConfig() Config {
 			".scss":       true,
 			".sql":        true,
 			".sum":        true,
+			".svg":        true,
 			".toml":       true,
 			".ts":         true,
+			".tsv":        true,
 			".tsx":        true,
 			".txt":        true,
 			".xml":        true,
 			".yaml":       true,
 			".yml":        true,
-			"Makefile":    true,
+		},
+		PlainFiles: map[string]bool{
+			"Dockerfile": true,
+			"LICENSE":    true,
+			"Makefile":   true,
+			"readme":     true,
+			"README":     true,
 		},
 	}
 }
@@ -99,8 +111,8 @@ func main() {
 	config = DefaultConfig()
 	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
 	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
-	flag.StringVar(&config.OutputDir, "output", "", "Directory of output.")
-	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Random directory in /tmp if omitted.")
+	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
+	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Defaults to /tmp/${rand}")
 	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for loading styles.")
 	flag.Parse()
 
@@ -149,8 +161,7 @@ func (f *TrackedFile) Render(t *template.Template) {
 	}
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
-	_, canRender := config.TextExtensions[f.Extension]
-	if canRender {
+	if f.CanRender {
 		fileBytes, err := os.ReadFile(f.Origin)
 		checkErr(err)
 		fileStr := string(fileBytes)
@@ -363,14 +374,15 @@ func RenderSingleFilePages() {
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			_, canRender := config.TextExtensions[ext]
+			_, canRenderExtension := config.TextExtensions[ext]
+			_, canRenderByFullName := config.PlainFiles[filepath.Base(filename)]
 			partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
 			outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
 			debug("reading = %v", partialPath)
 			tf := TrackedFile{
 				BaseURL:        config.BaseURL,
 				Extension:      ext,
-				CanRender:      canRender,
+				CanRender:      canRenderExtension || canRenderByFullName,
 				Origin:         filename,
 				Destination:    outputName,
 				DestinationDir: path.Join(config.OutputDir, "files", partialPath),
