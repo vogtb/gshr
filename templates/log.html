@@ -25,7 +25,9 @@
           <tr>
             <td>{{ .Date }}</td>
             <td class="commit">
-              <a href="{{ $.RepoData.BaseURL }}commit/{{ .Hash }}">{{ .Message }}</a>
+              <a href="{{ $.RepoData.BaseURL }}{{ $.RepoData.Name }}/commit/{{ .Hash }}">
+                {{ .Message }}
+              </a>
             </td>
             <td>{{ .Author }}</td>
             <td align="right">{{ .FileChangeCount }}</td>

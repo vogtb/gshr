@@ -54,7 +54,7 @@ func RenderSingleFilePages(data RepoData) {
 			_, canRenderExtension := settings.TextExtensions[ext]
 			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
 			partialPath, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
-			outputName := path.Join(args.OutputDir, "files", partialPath, "index.html")
+			outputName := path.Join(args.OutputDir, data.Name, "files", partialPath, "index.html")
 			debug("reading %v %v", data.Name, partialPath)
 			(&FilePage{
 				RepoData:       data,
