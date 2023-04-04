@@ -24,15 +24,25 @@ var htmlTemplates embed.FS
 var config Config
 
 func main() {
+	var r *git.Repository = &git.Repository{}
+	Init()
+	CloneAndInfo(r)
+	RenderLogPage(r)
+	RenderAllCommitPages(r)
+	RenderAllFilesPage()
+	RenderSingleFilePages()
+}
+
+func Init() {
 	config = DefaultConfig()
 	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
 	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
 	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
-	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Defaults to /tmp/${rand}")
+	flag.StringVar(&config.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
 	flag.StringVar(&config.RepoData.BaseURL, "base-url", "/", "Base URL for serving.")
 	flag.StringVar(&config.RepoData.GitURL, "git-url", "", "Show where repo is hosted.")
-	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name for display")
-	flag.StringVar(&config.RepoData.Description, "desc", "untitled repo", "Description for display")
+	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name to show")
+	flag.StringVar(&config.RepoData.Description, "desc", "<no description>", "Description to show.")
 	flag.Parse()
 
 	if config.Repo == "" {
@@ -49,21 +59,16 @@ func main() {
 	debug("output = %v", config.OutputDir)
 	debug("clone = %v", config.CloneDir)
 	debug("base-url = %v", config.RepoData.BaseURL)
-	r := CloneAndInfo()
-	config.RepoData.ReadMePath = findFileInRoot(config.AllowedReadMeFiles)
-	config.RepoData.LicenseFilePath = findFileInRoot(config.AllowedLicenseFiles)
-	RenderLogPage(r)
-	RenderAllCommitPages(r)
-	RenderAllFilesPage()
-	RenderSingleFilePages()
 }
 
-func CloneAndInfo() *git.Repository {
-	r, err := git.PlainClone(config.CloneDir, false, &git.CloneOptions{
+func CloneAndInfo(r *git.Repository) {
+	repo, err := git.PlainClone(config.CloneDir, false, &git.CloneOptions{
 		URL: config.Repo,
 	})
 	checkErr(err)
-	return r
+	config.RepoData.ReadMePath = findFileInRoot(config.AllowedReadMeFiles)
+	config.RepoData.LicenseFilePath = findFileInRoot(config.AllowedLicenseFiles)
+	*r = *repo
 }
 
 func checkErr(err error) {
