@@ -27,6 +27,7 @@ dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${EN
     --name="gshr" \
     --desc="git static host repo -- generates static html for repo" \
     --repo=/Users/bvogt/dev/src/ben/gshr \
+    --git-url="git@git.vogt.world:./gshr.git" \
     --output=$(PWD)/target/output \
     --clone=$(PWD)/target/cloning \
 		&& \

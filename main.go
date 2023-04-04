@@ -96,6 +96,7 @@ func DefaultConfig() Config {
 
 type RepoData struct {
 	Name        string
+	GitURL      string
 	Description string
 	BaseURL     string
 }
@@ -107,6 +108,7 @@ func main() {
 	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
 	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Defaults to /tmp/${rand}")
 	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for serving.")
+	flag.StringVar(&config.RepoData.GitURL, "git-url", "", "Show where repo is hosted.")
 	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name for display")
 	flag.StringVar(&config.RepoData.Description, "desc", "untitled repo", "Description for display")
 	flag.Parse()
