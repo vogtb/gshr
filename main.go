@@ -30,6 +30,9 @@ var filesTemplateHtml string
 //go:embed log.template.html
 var logTemplateHtml string
 
+//go:embed commit.template.html
+var commitTemplateHtml string
+
 var (
 	config Config
 )
@@ -117,6 +120,7 @@ func main() {
 	debug("base-url = %v", config.BaseURL)
 	r := CloneAndInfo()
 	RenderLogPage(r)
+	RenderAllCommitPages(r)
 	RenderAllFilesPage()
 	RenderSingleFilePages()
 }
@@ -171,6 +175,7 @@ func (f *TrackedFile) Render(t *template.Template) {
 }
 
 type Commit struct {
+	BaseURL         string
 	Author          string
 	Date            string
 	Hash            string
@@ -193,10 +198,11 @@ func (mi *LogPage) Render(t *template.Template) {
 }
 
 type TrackedFileMetaData struct {
-	Mode   string
-	Name   string
-	Size   string
-	Origin string
+	BaseURL string
+	Mode    string
+	Name    string
+	Size    string
+	Origin  string
 }
 
 type FilesIndex struct {
@@ -211,12 +217,67 @@ func (fi *FilesIndex) Render(t *template.Template) {
 	checkErr(err)
 }
 
+type CommitDetail struct {
+	BaseURL         string
+	Author          string
+	AuthorEmail     string
+	Date            string
+	Hash            string
+	Message         string
+	FileChangeCount int
+	LinesAdded      int
+	LinesDeleted    int
+}
+
+func (c *CommitDetail) Render(t *template.Template) {
+	err := os.MkdirAll(path.Join(config.OutputDir, "commit", c.Hash), 0755)
+	checkErr(err)
+	output, err := os.Create(path.Join(config.OutputDir, "commit", c.Hash, "index.html"))
+	checkErr(err)
+	err = t.Execute(output, c)
+	checkErr(err)
+}
+
 func CloneAndInfo() *git.Repository {
 	r, err := git.PlainClone(config.CloneDir, false, &git.CloneOptions{
 		URL: config.Repo,
 	})
 	checkErr(err)
 	return r
+}
+
+func RenderAllCommitPages(r *git.Repository) {
+	t, err := template.New("commit").Parse(commitTemplateHtml)
+	checkErr(err)
+	ref, err := r.Head()
+	checkErr(err)
+	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
+	checkErr(err)
+	err = cIter.ForEach(func(c *object.Commit) error {
+		stats, err := c.Stats()
+		added := 0
+		deleted := 0
+		for i := 0; i < len(stats); i++ {
+			stat := stats[i]
+			added += stat.Addition
+			deleted += stat.Deletion
+		}
+		checkErr(err)
+		commitDetail := CommitDetail{
+			BaseURL:         config.BaseURL,
+			Author:          c.Author.Name,
+			AuthorEmail:     c.Author.Email,
+			Message:         c.Message,
+			Date:            c.Author.When.UTC().Format("2006-01-02 15:04:05"),
+			Hash:            c.Hash.String(),
+			FileChangeCount: len(stats),
+			LinesAdded:      added,
+			LinesDeleted:    deleted,
+		}
+		commitDetail.Render(t)
+		return nil
+	})
+	checkErr(err)
 }
 
 func RenderLogPage(r *git.Repository) {
@@ -239,6 +300,7 @@ func RenderLogPage(r *git.Repository) {
 		}
 		checkErr(err)
 		commits = append(commits, Commit{
+			BaseURL:         config.BaseURL,
 			Author:          c.Author.Name,
 			Message:         c.Message,
 			Date:            c.Author.When.UTC().Format("2006-01-02 15:04:05"),
@@ -273,10 +335,11 @@ func RenderAllFilesPage() {
 			Name, _ := strings.CutPrefix(filename, config.CloneDir)
 			Name, _ = strings.CutPrefix(Name, "/")
 			tf := TrackedFileMetaData{
-				Origin: filename,
-				Name:   Name,
-				Mode:   info.Mode().String(),
-				Size:   fmt.Sprintf("%v", info.Size()),
+				BaseURL: config.BaseURL,
+				Origin:  filename,
+				Name:    Name,
+				Mode:    info.Mode().String(),
+				Size:    fmt.Sprintf("%v", info.Size()),
 			}
 			trackedFiles = append(trackedFiles, tf)
 		}

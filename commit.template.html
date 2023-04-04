@@ -45,33 +45,39 @@
         </tbody>
       </table>
     </div>
-    <div class="log">
+    <div class="commit-detail">
       <table>
-        <thead>
-          <tr>
-            <td><b>Date</b></td>
-            <td><b>Commit message</b></td>
-            <td><b>Author</b></td>
-            <td align="right"><b>Files</b></td>
-            <td align="right"><b>+</b></td>
-            <td align="right"><b>-</b></td>
-          </tr>
-        </thead>
         <tbody>
-          {{ range $c := .Commits }}
           <tr>
-            <td>{{ $c.Date }}</td>
-            <td class="commit">
-              <a href="{{ .BaseURL }}commit/{{ $c.Hash }}">{{ $c.Message }}</a>
-            </td>
-            <td>{{ $c.Author }}</td>
-            <td align="right">{{ $c.FileChangeCount }}</td>
-            <td align="right">+{{ $c.LinesAdded }}</td>
-            <td align="right">-{{ $c.LinesDeleted }}</td>
+            <td><b>commit: </b></td>
+            <td><a href="{{ .BaseURL }}commit/{{ .Hash }}/">{{ .Hash }}</a></td>
           </tr>
-          {{ end }}
+          <tr>
+            <td><b>author: </b></td>
+            <td>{{ .Author }} &lt;{{ .AuthorEmail }}&gt;</td>
+          </tr>
+          <tr>
+            <td><b>date: </b></td>
+            <td> {{ .Date }}</td>
+          </tr>
+          <tr>
+            <td><b>message: </b></td>
+            <td> {{ .Message }}</td>
+          </tr>
         </tbody>
       </table>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              {{ .FileChangeCount }} file(s) changed,
+              {{ .LinesAdded }} insertions(+),
+              {{ .LinesDeleted }} deletions(-)
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <hr />
     </div>
   </div>
 </body>

@@ -37,9 +37,9 @@
           </tr>
           <tr>
             <td>
-              <a href="/log.html">Log</a>
+              <a href="{{ .BaseURL }}log.html">Log</a>
               |
-              <a href="/files.html">Files</a>
+              <a href="{{ .BaseURL }}files.html">Files</a>
             </td>
           </tr>
         </tbody>
@@ -58,7 +58,7 @@
           {{ range .Files }}
           <tr>
             <td>{{ .Mode }}</td>
-            <td><a href="files/{{ .Name }}/index.html">{{ .Name }}</a></td>
+            <td><a href="{{ .BaseURL }}files/{{ .Name }}/index.html">{{ .Name }}</a></td>
             <td>{{ .Size }}</td>
           </tr>
           {{ end }}
