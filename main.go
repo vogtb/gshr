@@ -34,7 +34,6 @@ func DefaultConfig() Config {
 		DebugOn:   true,
 		Repo:      "",
 		OutputDir: "",
-		BaseURL:   "/",
 		CloneDir:  "",
 		RepoData: RepoData{
 			Name:        "",
@@ -107,7 +106,7 @@ func main() {
 	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
 	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
 	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Defaults to /tmp/${rand}")
-	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for serving.")
+	flag.StringVar(&config.RepoData.BaseURL, "base-url", "/", "Base URL for serving.")
 	flag.StringVar(&config.RepoData.GitURL, "git-url", "", "Show where repo is hosted.")
 	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name for display")
 	flag.StringVar(&config.RepoData.Description, "desc", "untitled repo", "Description for display")
@@ -121,8 +120,7 @@ func main() {
 		config.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
 	}
 
-	config.BaseURL = path.Join(config.BaseURL, "/")
-	config.RepoData.BaseURL = config.BaseURL
+	config.RepoData.BaseURL = path.Join(config.RepoData.BaseURL, "/")
 
 	debug("repo = %v", config.Repo)
 	debug("output = %v", config.OutputDir)

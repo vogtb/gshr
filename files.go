@@ -11,11 +11,10 @@ import (
 )
 
 type FileOverview struct {
-	BaseURL string
-	Mode    string
-	Name    string
-	Size    string
-	Origin  string
+	Mode   string
+	Name   string
+	Size   string
+	Origin string
 }
 
 type FilesPage struct {
@@ -45,11 +44,10 @@ func RenderAllFilesPage() {
 			Name, _ := strings.CutPrefix(filename, config.CloneDir)
 			Name, _ = strings.CutPrefix(Name, "/")
 			tf := FileOverview{
-				BaseURL: config.BaseURL,
-				Origin:  filename,
-				Name:    Name,
-				Mode:    info.Mode().String(),
-				Size:    fmt.Sprintf("%v", info.Size()),
+				Origin: filename,
+				Name:   Name,
+				Mode:   info.Mode().String(),
+				Size:   fmt.Sprintf("%v", info.Size()),
 			}
 			files = append(files, tf)
 		}

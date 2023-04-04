@@ -21,16 +21,16 @@
           </tr>
         </thead>
         <tbody>
-          {{ range $c := .Commits }}
+          {{ range .Commits }}
           <tr>
-            <td>{{ $c.Date }}</td>
+            <td>{{ .Date }}</td>
             <td class="commit">
-              <a href="{{ .BaseURL }}commit/{{ $c.Hash }}">{{ $c.Message }}</a>
+              <a href="{{ $.RepoData.BaseURL }}commit/{{ .Hash }}">{{ .Message }}</a>
             </td>
-            <td>{{ $c.Author }}</td>
-            <td align="right">{{ $c.FileChangeCount }}</td>
-            <td align="right">+{{ $c.LinesAdded }}</td>
-            <td align="right">-{{ $c.LinesDeleted }}</td>
+            <td>{{ .Author }}</td>
+            <td align="right">{{ .FileChangeCount }}</td>
+            <td align="right">+{{ .LinesAdded }}</td>
+            <td align="right">-{{ .LinesDeleted }}</td>
           </tr>
           {{ end }}
         </tbody>

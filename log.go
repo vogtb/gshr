@@ -10,7 +10,6 @@ import (
 )
 
 type LogPageCommit struct {
-	BaseURL         string
 	Author          string
 	Date            string
 	Hash            string
@@ -52,7 +51,6 @@ func RenderLogPage(r *git.Repository) {
 		}
 		checkErr(err)
 		commits = append(commits, LogPageCommit{
-			BaseURL:         config.BaseURL,
 			Author:          c.Author.Name,
 			Message:         c.Message,
 			Date:            c.Author.When.UTC().Format("2006-01-02 15:04:05"),
