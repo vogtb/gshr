@@ -23,118 +23,6 @@ var htmlTemplates embed.FS
 
 var config Config
 
-type Config struct {
-	DebugOn             bool
-	Repo                string
-	OutputDir           string
-	CloneDir            string
-	BaseURL             string
-	RepoData            RepoData
-	AllowedLicenseFiles map[string]bool
-	AllowedReadMeFiles  map[string]bool
-	TextExtensions      map[string]bool
-	PlainFiles          map[string]bool
-}
-
-func DefaultConfig() Config {
-	config := Config{
-		DebugOn:   true,
-		Repo:      "",
-		OutputDir: "",
-		CloneDir:  "",
-		RepoData: RepoData{
-			Name:        "",
-			Description: "",
-			BaseURL:     "/",
-		},
-		TextExtensions: map[string]bool{
-			".c":          true,
-			".cc":         true,
-			".conf":       true,
-			".config":     true,
-			".cpp":        true,
-			".cs":         true,
-			".css":        true,
-			".csv":        true,
-			".Dockerfile": true,
-			".gitignore":  true,
-			".gitmodules": true,
-			".go":         true,
-			".h":          true,
-			".htm":        true,
-			".html":       true,
-			".iml":        true,
-			".js":         true,
-			".json":       true,
-			".jsx":        true,
-			".less":       true,
-			".lock":       true,
-			".log":        true,
-			".Makefile":   true,
-			".md":         true,
-			".mod":        true,
-			".php":        true,
-			".py":         true,
-			".rb":         true,
-			".rs":         true,
-			".scss":       true,
-			".sql":        true,
-			".sum":        true,
-			".svg":        true,
-			".toml":       true,
-			".ts":         true,
-			".tsv":        true,
-			".tsx":        true,
-			".txt":        true,
-			".xml":        true,
-			".yaml":       true,
-			".yml":        true,
-		},
-		PlainFiles: map[string]bool{
-			"Dockerfile":  true,
-			"license-mit": true,
-			"LICENSE-MIT": true,
-			"license":     true,
-			"LICENSE":     true,
-			"Makefile":    true,
-			"readme":      true,
-			"Readme":      true,
-			"ReadMe":      true,
-			"README":      true,
-		},
-		AllowedLicenseFiles: map[string]bool{
-			"license-mit": true,
-			"LICENSE-MIT": true,
-			"license.md":  true,
-			"LICENSE.md":  true,
-			"license.txt": true,
-			"LICENSE.txt": true,
-			"LICENSE":     true,
-		},
-		AllowedReadMeFiles: map[string]bool{
-			"readme.md":  true,
-			"Readme.md":  true,
-			"ReadMe.md":  true,
-			"README.md":  true,
-			"readme.txt": true,
-			"README.txt": true,
-			"README":     true,
-		},
-	}
-	return config
-}
-
-type RepoData struct {
-	Name            string
-	GitURL          string
-	Description     string
-	BaseURL         string
-	HasReadMe       bool
-	ReadMePath      string
-	HasLicenseFile  bool
-	LicenseFilePath string
-}
-
 func main() {
 	config = DefaultConfig()
 	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
@@ -160,12 +48,10 @@ func main() {
 	debug("repo = %v", config.Repo)
 	debug("output = %v", config.OutputDir)
 	debug("clone = %v", config.CloneDir)
-	debug("base-url = %v", config.BaseURL)
+	debug("base-url = %v", config.RepoData.BaseURL)
 	r := CloneAndInfo()
 	config.RepoData.ReadMePath = findFileInRoot(config.AllowedReadMeFiles)
-	config.RepoData.HasReadMe = config.RepoData.ReadMePath != ""
 	config.RepoData.LicenseFilePath = findFileInRoot(config.AllowedLicenseFiles)
-	config.RepoData.HasLicenseFile = config.RepoData.LicenseFilePath != ""
 	RenderLogPage(r)
 	RenderAllCommitPages(r)
 	RenderAllFilesPage()
