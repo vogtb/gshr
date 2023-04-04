@@ -29,6 +29,7 @@ dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${EN
     --clone=$(PWD)/target/cloning \
 		&& \
     cp gshr.css $(PWD)/target/output/ && \
+    cp favicon.ico $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 

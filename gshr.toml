@@ -5,3 +5,9 @@ name = "gshr"
 description = "git static host repo -- generates static html for repos"
 path = "/Users/bvogt/dev/src/ben/gshr"
 git_url = "git@git.vogt.world:vogtb/gshr.git"
+
+[[repos]]
+name = "www"
+description = "static site for www.vogt.world"
+path = "/Users/bvogt/dev/src/ben/www"
+git_url = "git@git.vogt.world:vogtb/www.git"
