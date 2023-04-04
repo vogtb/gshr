@@ -6,14 +6,14 @@ import (
 
 type Config struct {
 	Repos   []Repo
-	BaseURL string
+	BaseURL string `toml:"base_url"`
 }
 
 type Repo struct {
 	Name        string
 	Description string
 	Path        string
-	GitURL      string
+	GitURL      string `toml:"git_url"`
 }
 
 func ParseConfiguration(data string) Config {

@@ -59,6 +59,7 @@ func Init() {
 	configFileByes, err := os.ReadFile(args.ConfigFile)
 	checkErr(err)
 	config = ParseConfiguration(string(configFileByes))
+	debug("base_url = %v", config.BaseURL)
 }
 
 func CloneAndGetData(repo Repo, r *git.Repository) RepoData {

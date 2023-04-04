@@ -253,10 +253,16 @@ div.content div.log {
 
 div.content div.log table,
 div.content div.commit-detail table,
+div.content div.index table,
 div.content div.files table {
   vertical-align: top;
   white-space: nowrap;
   width: 100%;
+}
+
+div.content div.log table,
+div.content div.commit-detail table,
+div.content div.files table {
   font-family: var(--mono-font);
 }
 

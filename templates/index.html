@@ -2,33 +2,51 @@
 <html lang="en">
 
 <head>
-  {{ template "head" .RepoData }}
+  {{ template "head" .BaseURL }}
 </head>
 
 <body>
   <div class="content">
+    <div class="metadata">
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <h1>Git Repositories</h1>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="index">
       <div class="metadata">
         <table>
+          <thead>
+            <tr>
+              <td><b>Name</b></td>
+              <td><b>Description</b></td>
+              <td><b>Git URL</b></td>
+            </tr>
+          </thead>
           <tbody>
+            {{ range .Repos }}
             <tr>
               <td>
-                <h1>whatever</h1>
-                <span class="desc">
-                  ???
-                </span>
+                <a href="{{ $.BaseURL }}{{ .Name }}/log.html">
+                  {{ .Name }}
+                </a>
               </td>
-            </tr>
-            <tr>
               <td>
-                <a href="/whatever">link?</a>
+                {{ .Description }}
               </td>
-            </tr>
-            <tr>
               <td>
-                etc.....
+                git clone
+                <a href="{{ .GitURL }}">
+                  {{ .GitURL }}
+                </a>
               </td>
             </tr>
+            {{ end }}
           </tbody>
         </table>
       </div>
