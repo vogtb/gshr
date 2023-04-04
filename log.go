@@ -26,14 +26,14 @@ type LogPage struct {
 	Commits    []LogPageCommit
 }
 
-func (mi *LogPage) Render(t *template.Template) {
-	output, err := os.Create(path.Join(config.OutputDir, "log.html"))
+func (l *LogPage) Render(t *template.Template) {
+	output, err := os.Create(path.Join(args.OutputDir, l.RepoData.Name, "log.html"))
 	checkErr(err)
-	err = t.Execute(output, mi)
+	err = t.Execute(output, l)
 	checkErr(err)
 }
 
-func RenderLogPage(r *git.Repository) {
+func RenderLogPage(data RepoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "templates/log.html", "templates/partials.html")
 	checkErr(err)
 	commits := make([]LogPageCommit, 0)
@@ -64,7 +64,7 @@ func RenderLogPage(r *git.Repository) {
 	})
 	checkErr(err)
 	(&LogPage{
-		RepoData: config.RepoData,
+		RepoData: data,
 		Commits:  commits,
 	}).Render(t)
 }

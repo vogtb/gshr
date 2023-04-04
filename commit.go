@@ -28,15 +28,15 @@ type CommitPage struct {
 }
 
 func (c *CommitPage) Render(t *template.Template) {
-	err := os.MkdirAll(path.Join(config.OutputDir, "commit", c.Hash), 0755)
+	err := os.MkdirAll(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash), 0755)
 	checkErr(err)
-	output, err := os.Create(path.Join(config.OutputDir, "commit", c.Hash, "index.html"))
+	output, err := os.Create(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash, "index.html"))
 	checkErr(err)
 	err = t.Execute(output, c)
 	checkErr(err)
 }
 
-func RenderAllCommitPages(r *git.Repository) {
+func RenderAllCommitPages(data RepoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "templates/commit.html", "templates/partials.html")
 	checkErr(err)
 	ref, err := r.Head()
@@ -89,7 +89,7 @@ func RenderAllCommitPages(r *git.Repository) {
 		}
 		checkErr(err)
 		(&CommitPage{
-			RepoData:        config.RepoData,
+			RepoData:        data,
 			Author:          c.Author.Name,
 			AuthorEmail:     c.Author.Email,
 			Message:         c.Message,

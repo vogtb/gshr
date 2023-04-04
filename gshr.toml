@@ -1,0 +1,7 @@
+base_url = "/"
+
+[[repos]]
+name = "gshr"
+description = "git static host repo -- generates static html for repos"
+path = "/Users/bvogt/dev/src/ben/gshr"
+git_url = "git@git.vogt.world:vogtb/gshr.git"

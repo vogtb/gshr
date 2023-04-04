@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"embed"
 	_ "embed"
-	"errors"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -20,54 +19,67 @@ import (
 //go:embed templates/*
 var htmlTemplates embed.FS
 
+var args CmdArgs
+
 var config Config
+
+var settings Settings
 
 func main() {
 	var r *git.Repository = &git.Repository{}
 	Init()
-	CloneAndInfo(r)
-	RenderLogPage(r)
-	RenderAllCommitPages(r)
-	RenderAllFilesPage()
-	RenderSingleFilePages()
+	allRepoData := []RepoData{}
+	for _, repo := range config.Repos {
+		data := CloneAndGetData(repo, r)
+		allRepoData = append(allRepoData, data)
+		RenderLogPage(data, r)
+		RenderAllCommitPages(data, r)
+		RenderAllFilesPage(data)
+		RenderSingleFilePages(data)
+	}
+	RenderIndexPage(allRepoData)
 }
 
 func Init() {
-	config = DefaultConfig()
-	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
-	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
-	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
-	flag.StringVar(&config.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
-	flag.StringVar(&config.RepoData.BaseURL, "base-url", "/", "Base URL for serving.")
-	flag.StringVar(&config.RepoData.GitURL, "git-url", "", "Show where repo is hosted.")
-	flag.StringVar(&config.RepoData.Description, "desc", "<no description>", "Description to show.")
+	args = DefaultCmdArgs()
+	settings = DefaultSettings()
+	flag.StringVar(&args.ConfigFile, "config", "", "Config file.")
+	flag.BoolVar(&args.DebugOn, "debug", true, "Run in debug mode.")
+	flag.StringVar(&args.OutputDir, "output", "", "Dir of output.")
+	flag.StringVar(&args.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
 	flag.Parse()
 
-	if config.Repo == "" {
-		checkErr(errors.New("--repo flag is required"))
+	if args.CloneDir == "" {
+		args.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
 	}
 
-	if config.CloneDir == "" {
-		config.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
-	}
-
-	config.RepoData.BaseURL = path.Join(config.RepoData.BaseURL, "/")
-	config.RepoData.Name = path.Clean(path.Base(config.Repo))
-
-	debug("repo = %v", config.Repo)
-	debug("output = %v", config.OutputDir)
-	debug("clone = %v", config.CloneDir)
-	debug("base-url = %v", config.RepoData.BaseURL)
+	debug("config = %v", args.ConfigFile)
+	debug("output = %v", args.OutputDir)
+	debug("clone = %v", args.CloneDir)
+	configFileByes, err := os.ReadFile(args.ConfigFile)
+	checkErr(err)
+	config = ParseConfiguration(string(configFileByes))
 }
 
-func CloneAndInfo(r *git.Repository) {
-	repo, err := git.PlainClone(config.CloneDir, false, &git.CloneOptions{
-		URL: config.Repo,
+func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
+	err := os.MkdirAll(path.Join(args.CloneDir, repo.Name), 0755)
+	checkErr(err)
+	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
+	checkErr(err)
+	repoRef, err := git.PlainClone(path.Join(args.CloneDir, repo.Name), false, &git.CloneOptions{
+		URL: repo.Path,
 	})
 	checkErr(err)
-	config.RepoData.ReadMePath = findFileInRoot(config.AllowedReadMeFiles)
-	config.RepoData.LicenseFilePath = findFileInRoot(config.AllowedLicenseFiles)
-	*r = *repo
+	data := RepoData{
+		Name:            repo.Name,
+		GitURL:          repo.GitURL,
+		Description:     repo.Description,
+		BaseURL:         config.BaseURL,
+		ReadMePath:      findFileInRoot(repo.Name, settings.AllowedReadMeFiles),
+		LicenseFilePath: findFileInRoot(repo.Name, settings.AllowedLicenseFiles),
+	}
+	*r = *repoRef
+	return data
 }
 
 func checkErr(err error) {
@@ -78,7 +90,7 @@ func checkErr(err error) {
 }
 
 func debug(format string, a ...any) {
-	if config.DebugOn {
+	if args.DebugOn {
 		fmt.Printf(format, a...)
 		fmt.Print("\n")
 	}
@@ -105,8 +117,8 @@ func highlight(pathOrExtension string, data *string) string {
 	return buf.String()
 }
 
-func findFileInRoot(oneOfThese map[string]bool) string {
-	dir, err := os.ReadDir(config.CloneDir)
+func findFileInRoot(name string, oneOfThese map[string]bool) string {
+	dir, err := os.ReadDir(path.Join(args.CloneDir, name))
 	checkErr(err)
 	for _, e := range dir {
 		name := e.Name()
@@ -115,4 +127,89 @@ func findFileInRoot(oneOfThese map[string]bool) string {
 		}
 	}
 	return ""
+}
+
+type Settings struct {
+	TextExtensions      map[string]bool
+	PlainFiles          map[string]bool
+	AllowedLicenseFiles map[string]bool
+	AllowedReadMeFiles  map[string]bool
+}
+
+func DefaultSettings() Settings {
+	return Settings{
+		TextExtensions: map[string]bool{
+			".c":          true,
+			".cc":         true,
+			".conf":       true,
+			".config":     true,
+			".cpp":        true,
+			".cs":         true,
+			".css":        true,
+			".csv":        true,
+			".Dockerfile": true,
+			".gitignore":  true,
+			".gitmodules": true,
+			".go":         true,
+			".h":          true,
+			".htm":        true,
+			".html":       true,
+			".iml":        true,
+			".js":         true,
+			".json":       true,
+			".jsx":        true,
+			".less":       true,
+			".lock":       true,
+			".log":        true,
+			".Makefile":   true,
+			".md":         true,
+			".mod":        true,
+			".php":        true,
+			".py":         true,
+			".rb":         true,
+			".rs":         true,
+			".scss":       true,
+			".sql":        true,
+			".sum":        true,
+			".svg":        true,
+			".toml":       true,
+			".ts":         true,
+			".tsv":        true,
+			".tsx":        true,
+			".txt":        true,
+			".xml":        true,
+			".yaml":       true,
+			".yml":        true,
+		},
+		PlainFiles: map[string]bool{
+			"Dockerfile":  true,
+			"license-mit": true,
+			"LICENSE-MIT": true,
+			"license":     true,
+			"LICENSE":     true,
+			"Makefile":    true,
+			"readme":      true,
+			"Readme":      true,
+			"ReadMe":      true,
+			"README":      true,
+		},
+		AllowedLicenseFiles: map[string]bool{
+			"license-mit": true,
+			"LICENSE-MIT": true,
+			"license.md":  true,
+			"LICENSE.md":  true,
+			"license.txt": true,
+			"LICENSE.txt": true,
+			"LICENSE":     true,
+		},
+		AllowedReadMeFiles: map[string]bool{
+			"readme.md":  true,
+			"Readme.md":  true,
+			"ReadMe.md":  true,
+			"README.md":  true,
+			"readme.txt": true,
+			"README.txt": true,
+			"README":     true,
+		},
+	}
 }

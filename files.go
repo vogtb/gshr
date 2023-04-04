@@ -22,18 +22,18 @@ type FilesPage struct {
 	Files    []FileOverview
 }
 
-func (fi *FilesPage) Render(t *template.Template) {
-	output, err := os.Create(path.Join(config.OutputDir, "files.html"))
+func (f *FilesPage) Render(t *template.Template) {
+	output, err := os.Create(path.Join(args.OutputDir, f.RepoData.Name, "files.html"))
 	checkErr(err)
-	err = t.Execute(output, fi)
+	err = t.Execute(output, f)
 	checkErr(err)
 }
 
-func RenderAllFilesPage() {
+func RenderAllFilesPage(data RepoData) {
 	t, err := template.ParseFS(htmlTemplates, "templates/files.html", "templates/partials.html")
 	checkErr(err)
 	files := make([]FileOverview, 0)
-	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(path.Join(args.CloneDir, data.Name), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
@@ -41,7 +41,7 @@ func RenderAllFilesPage() {
 		if !info.IsDir() {
 			info, err := os.Stat(filename)
 			checkErr(err)
-			Name, _ := strings.CutPrefix(filename, config.CloneDir)
+			Name, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
 			Name, _ = strings.CutPrefix(Name, "/")
 			tf := FileOverview{
 				Origin: filename,
@@ -55,7 +55,7 @@ func RenderAllFilesPage() {
 	})
 	checkErr(err)
 	index := FilesPage{
-		RepoData: config.RepoData,
+		RepoData: data,
 		Files:    files,
 	}
 	index.Render(t)

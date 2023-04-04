@@ -41,28 +41,28 @@ func (f *FilePage) Render(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderSingleFilePages() {
+func RenderSingleFilePages(data RepoData) {
 	t, err := template.ParseFS(htmlTemplates, "templates/file.html", "templates/partials.html")
 	checkErr(err)
-	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(path.Join(args.CloneDir, data.Name), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			_, canRenderExtension := config.TextExtensions[ext]
-			_, canRenderByFullName := config.PlainFiles[filepath.Base(filename)]
-			partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
-			outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
-			debug("reading = %v", partialPath)
+			_, canRenderExtension := settings.TextExtensions[ext]
+			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
+			partialPath, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
+			outputName := path.Join(args.OutputDir, "files", partialPath, "index.html")
+			debug("reading %v %v", data.Name, partialPath)
 			(&FilePage{
-				RepoData:       config.RepoData,
+				RepoData:       data,
 				Extension:      ext,
 				CanRender:      canRenderExtension || canRenderByFullName,
 				Origin:         filename,
 				Destination:    outputName,
-				DestinationDir: path.Join(config.OutputDir, "files", partialPath),
+				DestinationDir: path.Join(args.OutputDir, data.Name, "files", partialPath),
 			}).Render(t)
 		}
 		return nil
