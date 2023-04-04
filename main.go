@@ -24,18 +24,20 @@ var htmlTemplates embed.FS
 var config Config
 
 type Config struct {
-	DebugOn        bool
-	Repo           string
-	OutputDir      string
-	CloneDir       string
-	BaseURL        string
-	RepoData       RepoData
-	TextExtensions map[string]bool
-	PlainFiles     map[string]bool
+	DebugOn             bool
+	Repo                string
+	OutputDir           string
+	CloneDir            string
+	BaseURL             string
+	RepoData            RepoData
+	AllowedLicenseFiles map[string]bool
+	AllowedReadMeFiles  map[string]bool
+	TextExtensions      map[string]bool
+	PlainFiles          map[string]bool
 }
 
 func DefaultConfig() Config {
-	return Config{
+	config := Config{
 		DebugOn:   true,
 		Repo:      "",
 		OutputDir: "",
@@ -89,13 +91,37 @@ func DefaultConfig() Config {
 			".yml":        true,
 		},
 		PlainFiles: map[string]bool{
-			"Dockerfile": true,
-			"LICENSE":    true,
-			"Makefile":   true,
-			"readme":     true,
+			"Dockerfile":  true,
+			"license-mit": true,
+			"LICENSE-MIT": true,
+			"license":     true,
+			"LICENSE":     true,
+			"Makefile":    true,
+			"readme":      true,
+			"Readme":      true,
+			"ReadMe":      true,
+			"README":      true,
+		},
+		AllowedLicenseFiles: map[string]bool{
+			"license-mit": true,
+			"LICENSE-MIT": true,
+			"license.md":  true,
+			"LICENSE.md":  true,
+			"license.txt": true,
+			"LICENSE.txt": true,
+			"LICENSE":     true,
+		},
+		AllowedReadMeFiles: map[string]bool{
+			"readme.md":  true,
+			"Readme.md":  true,
+			"ReadMe.md":  true,
+			"README.md":  true,
+			"readme.txt": true,
+			"README.txt": true,
 			"README":     true,
 		},
 	}
+	return config
 }
 
 type RepoData struct {
@@ -136,9 +162,9 @@ func main() {
 	debug("clone = %v", config.CloneDir)
 	debug("base-url = %v", config.BaseURL)
 	r := CloneAndInfo()
-	config.RepoData.ReadMePath = getReadmePath()
+	config.RepoData.ReadMePath = findFileInRoot(config.AllowedReadMeFiles)
 	config.RepoData.HasReadMe = config.RepoData.ReadMePath != ""
-	config.RepoData.LicenseFilePath = getLicenseFilePath()
+	config.RepoData.LicenseFilePath = findFileInRoot(config.AllowedLicenseFiles)
 	config.RepoData.HasLicenseFile = config.RepoData.LicenseFilePath != ""
 	RenderLogPage(r)
 	RenderAllCommitPages(r)
@@ -194,33 +220,13 @@ func highlight(pathOrExtension string, data *string) string {
 	return buf.String()
 }
 
-func getReadmePath() string {
-	for _, file := range []string{
-		"readme.md",
-		"README.md",
-		"readme.txt",
-		"README.txt",
-		"README",
-	} {
-		if stat, err := os.Stat(path.Join(config.CloneDir, file)); err == nil {
-			return stat.Name()
-		}
-	}
-	return ""
-}
-
-func getLicenseFilePath() string {
-	for _, file := range []string{
-		"license-mit",
-		"LICENSE-MIT",
-		"license.md",
-		"LICENSE.md",
-		"license.txt",
-		"LICENSE.txt",
-		"LICENSE",
-	} {
-		if stat, err := os.Stat(path.Join(config.CloneDir, file)); err == nil {
-			return stat.Name()
+func findFileInRoot(oneOfThese map[string]bool) string {
+	dir, err := os.ReadDir(config.CloneDir)
+	checkErr(err)
+	for _, e := range dir {
+		name := e.Name()
+		if _, ok := oneOfThese[name]; ok {
+			return name
 		}
 	}
 	return ""
