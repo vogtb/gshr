@@ -10,20 +10,22 @@ rfind=$(shell find $1 -type f -not -path "./target/*")
 target:
 	mkdir -p target
 
-output:
+target/output: target
 	mkdir -p target/output
 
-cloning:
+target/cloning: target
 	mkdir -p target/cloning
 
 clean:
 	rm -rf target/*
 
-target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin:
+target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin: Makefile target
 	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin $(wildcard *.go)
 
-dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
+dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
+    --name="gshr" \
+    --desc="git static host repo -- generates static html for repo" \
     --repo=/Users/bvogt/dev/src/ben/gshr \
     --output=$(PWD)/target/output \
     --clone=$(PWD)/target/cloning \
@@ -31,3 +33,6 @@ dev: target output cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
     cp gshr.css $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
+
+fmt:
+	go fmt

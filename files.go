@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type TrackedFileMetaData struct {
+type FileOverview struct {
 	BaseURL string
 	Mode    string
 	Name    string
@@ -18,12 +18,12 @@ type TrackedFileMetaData struct {
 	Origin  string
 }
 
-type FilesIndex struct {
-	BaseURL string
-	Files   []TrackedFileMetaData
+type FilesPage struct {
+	RepoData RepoData
+	Files    []FileOverview
 }
 
-func (fi *FilesIndex) Render(t *template.Template) {
+func (fi *FilesPage) Render(t *template.Template) {
 	output, err := os.Create(path.Join(config.OutputDir, "files.html"))
 	checkErr(err)
 	err = t.Execute(output, fi)
@@ -33,7 +33,7 @@ func (fi *FilesIndex) Render(t *template.Template) {
 func RenderAllFilesPage() {
 	t, err := template.ParseFS(htmlTemplates, "templates/files.html", "templates/partials.html")
 	checkErr(err)
-	trackedFiles := make([]TrackedFileMetaData, 0)
+	files := make([]FileOverview, 0)
 	err = filepath.Walk(config.CloneDir, func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
@@ -44,21 +44,21 @@ func RenderAllFilesPage() {
 			checkErr(err)
 			Name, _ := strings.CutPrefix(filename, config.CloneDir)
 			Name, _ = strings.CutPrefix(Name, "/")
-			tf := TrackedFileMetaData{
+			tf := FileOverview{
 				BaseURL: config.BaseURL,
 				Origin:  filename,
 				Name:    Name,
 				Mode:    info.Mode().String(),
 				Size:    fmt.Sprintf("%v", info.Size()),
 			}
-			trackedFiles = append(trackedFiles, tf)
+			files = append(files, tf)
 		}
 		return nil
 	})
 	checkErr(err)
-	index := FilesIndex{
-		BaseURL: config.BaseURL,
-		Files:   trackedFiles,
+	index := FilesPage{
+		RepoData: config.RepoData,
+		Files:    files,
 	}
 	index.Render(t)
 }

@@ -14,8 +14,8 @@ import (
 	"github.com/alecthomas/chroma/styles"
 )
 
-type TrackedFile struct {
-	BaseURL        string
+type FilePage struct {
+	RepoData       RepoData
 	Mode           string
 	Name           string
 	Size           string
@@ -27,7 +27,7 @@ type TrackedFile struct {
 	Content        template.HTML
 }
 
-func (f *TrackedFile) Render(t *template.Template) {
+func (f *FilePage) Render(t *template.Template) {
 	lexer := lexers.Match(f.DestinationDir)
 	if lexer == nil {
 		lexer = lexers.Fallback
@@ -77,15 +77,14 @@ func RenderSingleFilePages() {
 			partialPath, _ := strings.CutPrefix(filename, config.CloneDir)
 			outputName := path.Join(config.OutputDir, "files", partialPath, "index.html")
 			debug("reading = %v", partialPath)
-			tf := TrackedFile{
-				BaseURL:        config.BaseURL,
+			(&FilePage{
+				RepoData:       config.RepoData,
 				Extension:      ext,
 				CanRender:      canRenderExtension || canRenderByFullName,
 				Origin:         filename,
 				Destination:    outputName,
 				DestinationDir: path.Join(config.OutputDir, "files", partialPath),
-			}
-			tf.Render(t)
+			}).Render(t)
 		}
 		return nil
 	})

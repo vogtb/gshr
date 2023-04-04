@@ -2,18 +2,22 @@
 <html lang="en">
 
 <head>
-  {{ template "head" . }}
+  {{ template "head" .RepoData }}
 </head>
 
 <body>
   <div class="content">
-    {{ template "metadata" . }}
+    {{ template "metadata" .RepoData }}
     <div class="commit-detail">
       <table>
         <tbody>
           <tr>
             <td><b>commit: </b></td>
-            <td><a href="{{ .BaseURL }}commit/{{ .Hash }}/">{{ .Hash }}</a></td>
+            <td>
+              <a href="{{ .RepoData.BaseURL }}commit/{{ .Hash }}/">
+                {{ .Hash }}
+              </a>
+            </td>
           </tr>
           <tr>
             <td><b>author: </b></td>

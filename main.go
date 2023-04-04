@@ -24,6 +24,7 @@ type Config struct {
 	OutputDir      string
 	CloneDir       string
 	BaseURL        string
+	RepoData       RepoData
 	TextExtensions map[string]bool
 	PlainFiles     map[string]bool
 }
@@ -35,6 +36,11 @@ func DefaultConfig() Config {
 		OutputDir: "",
 		BaseURL:   "/",
 		CloneDir:  "",
+		RepoData: RepoData{
+			Name:        "",
+			Description: "",
+			BaseURL:     "/",
+		},
 		TextExtensions: map[string]bool{
 			".c":          true,
 			".cc":         true,
@@ -88,13 +94,21 @@ func DefaultConfig() Config {
 	}
 }
 
+type RepoData struct {
+	Name        string
+	Description string
+	BaseURL     string
+}
+
 func main() {
 	config = DefaultConfig()
 	flag.StringVar(&config.Repo, "repo", "", "Repo to use.")
 	flag.BoolVar(&config.DebugOn, "debug", true, "Run in debug mode.")
 	flag.StringVar(&config.OutputDir, "output", "", "Dir of output.")
 	flag.StringVar(&config.CloneDir, "clone", "", "Directory to clone into. Defaults to /tmp/${rand}")
-	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for loading styles.")
+	flag.StringVar(&config.BaseURL, "base-url", "/", "Base URL for serving.")
+	flag.StringVar(&config.RepoData.Name, "name", "untitled repo", "Name for display")
+	flag.StringVar(&config.RepoData.Description, "desc", "untitled repo", "Description for display")
 	flag.Parse()
 
 	if config.Repo == "" {
@@ -106,6 +120,7 @@ func main() {
 	}
 
 	config.BaseURL = path.Join(config.BaseURL, "/")
+	config.RepoData.BaseURL = config.BaseURL
 
 	debug("repo = %v", config.Repo)
 	debug("output = %v", config.OutputDir)

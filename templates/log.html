@@ -2,12 +2,12 @@
 <html lang="en">
 
 <head>
-  {{ template "head" . }}
+  {{ template "head" .RepoData }}
 </head>
 
 <body>
   <div class="content">
-    {{ template "metadata" . }}
+    {{ template "metadata" .RepoData }}
     <div class="log">
       <table>
         <thead>

@@ -9,7 +9,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-type Commit struct {
+type LogPageCommit struct {
 	BaseURL         string
 	Author          string
 	Date            string
@@ -21,8 +21,8 @@ type Commit struct {
 }
 
 type LogPage struct {
-	BaseURL string
-	Commits []Commit
+	RepoData RepoData
+	Commits  []LogPageCommit
 }
 
 func (mi *LogPage) Render(t *template.Template) {
@@ -35,7 +35,7 @@ func (mi *LogPage) Render(t *template.Template) {
 func RenderLogPage(r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "templates/log.html", "templates/partials.html")
 	checkErr(err)
-	commits := make([]Commit, 0)
+	commits := make([]LogPageCommit, 0)
 	ref, err := r.Head()
 	checkErr(err)
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
@@ -51,7 +51,7 @@ func RenderLogPage(r *git.Repository) {
 			deleted += stat.Deletion
 		}
 		checkErr(err)
-		commits = append(commits, Commit{
+		commits = append(commits, LogPageCommit{
 			BaseURL:         config.BaseURL,
 			Author:          c.Author.Name,
 			Message:         c.Message,
@@ -65,9 +65,8 @@ func RenderLogPage(r *git.Repository) {
 	})
 
 	checkErr(err)
-	m := LogPage{
-		BaseURL: config.BaseURL,
-		Commits: commits,
-	}
-	m.Render(t)
+	(&LogPage{
+		RepoData: config.RepoData,
+		Commits:  commits,
+	}).Render(t)
 }

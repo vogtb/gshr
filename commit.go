@@ -9,8 +9,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-type CommitDetail struct {
-	BaseURL         string
+type CommitPage struct {
+	RepoData        RepoData
 	Author          string
 	AuthorEmail     string
 	Date            string
@@ -21,7 +21,7 @@ type CommitDetail struct {
 	LinesDeleted    int
 }
 
-func (c *CommitDetail) Render(t *template.Template) {
+func (c *CommitPage) Render(t *template.Template) {
 	err := os.MkdirAll(path.Join(config.OutputDir, "commit", c.Hash), 0755)
 	checkErr(err)
 	output, err := os.Create(path.Join(config.OutputDir, "commit", c.Hash, "index.html"))
@@ -47,8 +47,8 @@ func RenderAllCommitPages(r *git.Repository) {
 			deleted += stat.Deletion
 		}
 		checkErr(err)
-		commitDetail := CommitDetail{
-			BaseURL:         config.BaseURL,
+		(&CommitPage{
+			RepoData:        config.RepoData,
 			Author:          c.Author.Name,
 			AuthorEmail:     c.Author.Email,
 			Message:         c.Message,
@@ -57,8 +57,7 @@ func RenderAllCommitPages(r *git.Repository) {
 			FileChangeCount: len(stats),
 			LinesAdded:      added,
 			LinesDeleted:    deleted,
-		}
-		commitDetail.Render(t)
+		}).Render(t)
 		return nil
 	})
 	checkErr(err)
