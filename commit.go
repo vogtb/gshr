@@ -27,6 +27,7 @@ type CommitPage struct {
 	FileChangeCount int
 	LinesAdded      int
 	LinesDeleted    int
+	FilesChanged    []string
 	DiffContent     template.HTML
 }
 
@@ -54,6 +55,8 @@ func RenderAllCommitPages(r *git.Repository) {
 			checkErr(err)
 		}
 		diffContent := template.HTML("")
+		filesChangedMap := make(map[string]bool)
+		filesChanged := []string{}
 		if parent != nil {
 			lexer := lexers.Match("x.diff")
 			if lexer == nil {
@@ -77,6 +80,23 @@ func RenderAllCommitPages(r *git.Repository) {
 			err = formatter.Format(buf, style, iterator)
 			checkErr(err)
 			diffContent = template.HTML(buf.String())
+			for _, fp := range patch.FilePatches() {
+				from, to := fp.Files()
+				if from != nil {
+					filePath := from.Path()
+					if _, found := filesChangedMap[filePath]; !found {
+						filesChangedMap[filePath] = true
+						filesChanged = append(filesChanged, filePath)
+					}
+				}
+				if to != nil {
+					filePath := to.Path()
+					if _, found := filesChangedMap[filePath]; !found {
+						filesChangedMap[filePath] = true
+						filesChanged = append(filesChanged, filePath)
+					}
+				}
+			}
 		}
 		stats, err := c.Stats()
 		added := 0
@@ -97,6 +117,7 @@ func RenderAllCommitPages(r *git.Repository) {
 			FileChangeCount: len(stats),
 			LinesAdded:      added,
 			LinesDeleted:    deleted,
+			FilesChanged:    filesChanged,
 			DiffContent:     diffContent,
 		}).Render(t)
 		return nil

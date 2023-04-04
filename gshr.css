@@ -267,6 +267,7 @@ div.content * tr:hover {
 div.content * td {
   padding: 0 0.4em;
   max-width: 380px;
+  vertical-align: top;
 }
 
 .chroma {

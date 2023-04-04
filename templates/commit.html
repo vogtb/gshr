@@ -31,15 +31,20 @@
             <td><b>message: </b></td>
             <td> {{ .Message }}</td>
           </tr>
-        </tbody>
-      </table>
-      <table>
-        <tbody>
           <tr>
+            <td><b>stats: </b></td>
             <td>
               {{ .FileChangeCount }} file(s) changed,
               {{ .LinesAdded }} insertions(+),
               {{ .LinesDeleted }} deletions(-)
+            </td>
+          </tr>
+          <tr>
+            <td><b>files: </b></td>
+            <td>
+              {{ range .FilesChanged }}
+              <div>{{ . }}</div>
+              {{ end }}
             </td>
           </tr>
         </tbody>
