@@ -7,7 +7,11 @@ require (
 	github.com/go-git/go-git/v5 v5.6.1
 )
 
-require github.com/BurntSushi/toml v1.2.1 // indirect
+require (
+	github.com/BurntSushi/toml v1.2.1
+	github.com/stretchr/testify v1.8.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
@@ -21,7 +25,6 @@ require (
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.7
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
