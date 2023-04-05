@@ -47,9 +47,9 @@ func Init() {
 	args = DefaultCmdArgs()
 	settings = DefaultSettings()
 	flag.StringVar(&args.ConfigFile, "config", "", "Config file.")
-	flag.BoolVar(&args.Silent, "silent", false, "Run in silent mode.")
 	flag.StringVar(&args.OutputDir, "output", "", "Dir of output.")
 	flag.StringVar(&args.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
+	flag.BoolVar(&args.Silent, "silent", false, "Run in silent mode.")
 	flag.Parse()
 
 	if args.CloneDir == "" {

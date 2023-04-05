@@ -26,7 +26,7 @@ type LogPage struct {
 	Commits    []LogPageCommit
 }
 
-func (l *LogPage) Render(t *template.Template) {
+func (l *LogPage) RenderPage(t *template.Template) {
 	debug("log page for '%v'", l.RepoData.Name)
 	output, err := os.Create(path.Join(args.OutputDir, l.RepoData.Name, "log.html"))
 	checkErr(err)
@@ -67,5 +67,5 @@ func RenderLogPage(data RepoData, r *git.Repository) {
 	(&LogPage{
 		RepoData: data,
 		Commits:  commits,
-	}).Render(t)
+	}).RenderPage(t)
 }

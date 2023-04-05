@@ -22,7 +22,7 @@ type FilePage struct {
 	Content        template.HTML
 }
 
-func (f *FilePage) Render(t *template.Template) {
+func (f *FilePage) RenderPage(t *template.Template) {
 	debug("file %v%v", f.RepoData.Name, f.Name)
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
@@ -64,7 +64,7 @@ func RenderSingleFilePages(data RepoData) {
 				Origin:         filename,
 				Destination:    outputName,
 				DestinationDir: path.Join(args.OutputDir, data.Name, "files", partialPath),
-			}).Render(t)
+			}).RenderPage(t)
 		}
 		return nil
 	})

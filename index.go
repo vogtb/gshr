@@ -12,7 +12,7 @@ type IndexPage struct {
 	Repos    []RepoData
 }
 
-func (l *IndexPage) Render(t *template.Template) {
+func (l *IndexPage) RenderPage(t *template.Template) {
 	debug("index for '%v'", l.SiteName)
 	output, err := os.Create(path.Join(args.OutputDir, "index.html"))
 	checkErr(err)
@@ -27,5 +27,5 @@ func RenderIndexPage(repos []RepoData) {
 		BaseURL:  config.BaseURL,
 		SiteName: config.SiteName,
 		Repos:    repos,
-	}).Render(t)
+	}).RenderPage(t)
 }

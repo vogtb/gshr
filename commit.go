@@ -24,7 +24,7 @@ type CommitPage struct {
 	DiffContent     template.HTML
 }
 
-func (c *CommitPage) Render(t *template.Template) {
+func (c *CommitPage) RenderPage(t *template.Template) {
 	debug("commit %v %v", c.RepoData.Name, c.Hash)
 	err := os.MkdirAll(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash), 0755)
 	checkErr(err)
@@ -98,7 +98,7 @@ func RenderAllCommitPages(data RepoData, r *git.Repository) {
 			LinesDeleted:    deleted,
 			FilesChanged:    filesChanged,
 			DiffContent:     diffContent,
-		}).Render(t)
+		}).RenderPage(t)
 		return nil
 	})
 	checkErr(err)
