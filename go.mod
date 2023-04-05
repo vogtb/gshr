@@ -1,4 +1,4 @@
-module ben/gshr
+module github.com/vogtb/gshr
 
 go 1.20
 
