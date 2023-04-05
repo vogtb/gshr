@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
@@ -56,14 +57,28 @@ func Init() {
 	log.SetOutput(new(LogWriter))
 	args = DefaultCmdArgs()
 	settings = DefaultSettings()
-	flag.StringVar(&args.ConfigFile, "config", "", "Config file.")
-	flag.StringVar(&args.OutputDir, "output", "", "Dir of output.")
-	flag.BoolVar(&args.Silent, "silent", false, "Run in silent mode.")
+	pwd, err := os.Getwd()
+	checkErr(err)
+	args.Wd = pwd
+	flag.StringVar(&args.ConfigPath, "c", "", "Config file.")
+	flag.StringVar(&args.OutputDir, "o", "", "Dir of output.")
+	flag.BoolVar(&args.Silent, "s", false, "Run in silent mode.")
 	flag.Parse()
+	debug("working dir '%v'", args.Wd)
 
-	debug("config '%v'", args.ConfigFile)
+	if !strings.HasPrefix(args.ConfigPath, "/") {
+		args.ConfigPath = path.Join(args.Wd, args.ConfigPath)
+		checkFile(args.ConfigPath)
+	}
+
+	if !strings.HasPrefix(args.OutputDir, "/") {
+		args.OutputDir = path.Join(args.Wd, args.OutputDir)
+		checkDir(args.OutputDir)
+	}
+
+	debug("config '%v'", args.ConfigPath)
 	debug("output '%v'", args.OutputDir)
-	configFileBytes, err := os.ReadFile(args.ConfigFile)
+	configFileBytes, err := os.ReadFile(args.ConfigPath)
 	configString := string(configFileBytes)
 	checkErr(err)
 	config = ParseConfiguration(configString)
@@ -129,6 +144,16 @@ func checkErr(err error) {
 	}
 }
 
+func checkFile(filename string) {
+	_, err := os.Stat(filename)
+	checkErr(err)
+}
+
+func checkDir(dir string) {
+	_, err := os.ReadDir(dir)
+	checkErr(err)
+}
+
 func debug(format string, a ...any) {
 	if !args.Silent {
 		log.Printf("DEBUG: "+format, a...)
@@ -158,14 +183,15 @@ func highlight(pathOrExtension string, data *string) string {
 
 type CmdArgs struct {
 	Silent     bool
-	ConfigFile string
+	Wd         string
+	ConfigPath string
 	OutputDir  string
 }
 
 func DefaultCmdArgs() CmdArgs {
 	return CmdArgs{
 		Silent:     true,
-		ConfigFile: "",
+		ConfigPath: "",
 		OutputDir:  "",
 	}
 }

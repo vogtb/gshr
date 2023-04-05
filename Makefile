@@ -21,24 +21,24 @@ build: Makefile target target/output  target/gshr.bin
 
 dev: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
-    --config=$(PWD)/gshr.toml \
-    --output=$(PWD)/target/output \
+    -c=gshr.toml \
+    -o=target/output \
 		&& \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
 dev-example-go-git: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
-    --config=$(PWD)/examples/go-git.toml \
-    --output=$(PWD)/target/output \
+    -c=$(PWD)/examples/go-git.toml \
+    -c=$(PWD)/target/output \
 		&& \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
 dev-example-gshr: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
-    --config=$(PWD)/examples/ghsr-simple.toml \
-    --output=$(PWD)/target/output \
+    -c=$(PWD)/examples/ghsr-simple.toml \
+    -o=$(PWD)/target/output \
 		&& \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000

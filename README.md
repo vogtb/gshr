@@ -32,12 +32,9 @@ See more examples in [tree/master/examples](tree/master/examples).
 
 ```
 Usage of gshr:
-  -config string
-    	Config file.
-  -output string
-    	Dir of output.
-  -silent
-    	Run in silent mode.
+  -c Config file.
+  -o Dir of output.
+  -s Run in silent mode.
 ```
 
 The toml file needs to be in the format:
