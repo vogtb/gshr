@@ -1,5 +1,5 @@
-base_url = "https://vogtb.github.io/gshr/"
-site_name = "gshr demo page for github pages"
+base_url = "https://localhost/"
+site_name = "development site - should run on port 80"
 
 [[repos]]
 name = "gshr"
