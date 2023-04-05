@@ -28,17 +28,17 @@ target/gshr.bin: Makefile target $(wildcard *.go)
 build: Makefile target target/output  target/gshr.bin
 	@# intentionally blank, proxy for prerequisite.
 
-dev: Makefile target target/output  target/gshr.bin
+dev: Makefile target target/output target/gshr.bin
 	./target/gshr.bin -c=dev-config-gshr.toml -o=target/output && \
     cd target/output && \
     python3 -m http.server 80
 
-dev-example-go-git: Makefile target target/output  target/gshr.bin
+dev-example-go-git: Makefile target target/output target/gshr.bin
 	./target/gshr.bin -c=example-config-gshr-simple.toml -o=target/output && \
     cd target/output && \
     python3 -m http.server 80
 
-dev-example-gshr-simple: Makefile target target/output  target/gshr.bin
+dev-example-gshr-simple: Makefile target target/output target/gshr.bin
 	./target/gshr.bin -c=example-config-gshr-simple.toml -o=target/output && \
     cd target/output && \
     python3 -m http.server 80

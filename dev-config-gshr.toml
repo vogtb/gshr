@@ -1,23 +1,23 @@
-base_url = "http://localhost/git/"
-site_name = "public, self hosted git repositories"
+base_url = "https://vogtb.github.io/gshr/"
+site_name = "gshr demo page for github pages"
 
 [[repos]]
 name = "gshr"
 description = "git static host repo -- generates static html for repos"
 url = "https://github.com/vogtb/gshr"
-published_git_url = "github.com/vogtb/gshr"
+published_git_url = "https://github.com/vogtb/gshr"
 host_git = true
 
 [[repos]]
 name = "f7"
 description = "f7 is a spreadsheet formula execution library"
 url = "https://github.com/vogtb/f7"
-published_git_url = "github.com/vogtb/f7"
+published_git_url = "https://github.com/vogtb/f7"
 host_git = true
 
 [[repos]]
 name = "spreadsheet"
-description = "TypeScript/javascript spreadsheet parser, with formulas."
+description = "typeScript/javascript spreadsheet parser, with formulas"
 url = "https://github.com/vogtb/spreadsheet"
-published_git_url = "github.com/vogtb/spreadsheet"
+published_git_url = "https://github.com/vogtb/spreadsheet"
 host_git = true
