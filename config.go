@@ -11,10 +11,10 @@ type Config struct {
 }
 
 type Repo struct {
-	Name        string
-	Description string
-	Path        string
-	GitURL      string `toml:"git_url"`
+	Name            string
+	Description     string
+	URL             string
+	PublishedGitURL string `toml:"published_git_url"`
 }
 
 func ParseConfiguration(data string) Config {
@@ -26,7 +26,7 @@ func ParseConfiguration(data string) Config {
 
 type RepoData struct {
 	Name            string
-	GitURL          string
+	PublishedGitURL string
 	Description     string
 	BaseURL         string
 	ReadMePath      string

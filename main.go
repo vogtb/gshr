@@ -68,12 +68,12 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
 	checkErr(err)
 	repoRef, err := git.PlainClone(path.Join(args.CloneDir, repo.Name), false, &git.CloneOptions{
-		URL: repo.Path,
+		URL: repo.URL,
 	})
 	checkErr(err)
 	data := RepoData{
 		Name:            repo.Name,
-		GitURL:          repo.GitURL,
+		PublishedGitURL: repo.PublishedGitURL,
 		Description:     repo.Description,
 		BaseURL:         config.BaseURL,
 		ReadMePath:      findFileInRoot(repo.Name, settings.AllowedReadMeFiles),

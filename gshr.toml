@@ -4,17 +4,17 @@ site_name = "public, self hosted git repositories"
 [[repos]]
 name = "gshr"
 description = "git static host repo -- generates static html for repos"
-path = "/Users/bvogt/dev/src/ben/gshr"
-git_url = "git@git.vogt.world:vogtb/gshr.git"
+url = "/Users/bvogt/dev/src/ben/gshr"
+published_git_url = "git@git.vogt.world:vogtb/gshr.git"
 
 [[repos]]
 name = "www"
 description = "static site for www.vogt.world"
-path = "/Users/bvogt/dev/src/ben/www"
-git_url = "git@git.vogt.world:vogtb/www.git"
+url = "/Users/bvogt/dev/src/ben/www"
+published_git_url = "git@git.vogt.world:vogtb/www.git"
 
 [[repos]]
 name = "f7"
 description = "f7 is a spreadsheet formula execution library"
-path = "/Users/bvogt/dev/src/ben/f7"
-git_url = "git@git.vogt.world:vogtb/f7.git"
+url = "/Users/bvogt/dev/src/ben/f7"
+published_git_url = "git@git.vogt.world:vogtb/f7.git"
