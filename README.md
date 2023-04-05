@@ -32,8 +32,6 @@ See more examples in [tree/master/examples](tree/master/examples).
 
 ```
 Usage of gshr:
-  -clone string
-    	Dir to clone into. Default is /tmp/${rand}
   -config string
     	Config file.
   -output string

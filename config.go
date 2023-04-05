@@ -24,7 +24,7 @@ type Repo struct {
 // / CloneDir gets the directory that this repo was cloned into using the output directory
 // / from the program arguments, and this repo's name.
 func (r *Repo) CloneDir() string {
-	return path.Join(args.OutputDir, "git", r.Name)
+	return path.Join(args.OutputDir, r.Name, "git")
 }
 
 func (r *Repo) FindFileInRoot(oneOfThese map[string]bool) string {

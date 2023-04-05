@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 
 	"github.com/alecthomas/chroma/formatters/html"
@@ -45,6 +46,9 @@ func main() {
 	}
 	RenderIndexPage(allRepoData)
 	RenderAssets()
+	for _, repo := range config.Repos {
+		HostRepo(repo)
+	}
 }
 
 func Init() {
@@ -93,6 +97,23 @@ func RenderAssets() {
 	debug("rendering favicon.ico")
 	checkErr(os.WriteFile(path.Join(args.OutputDir, "gshr.css"), css, 0666))
 	checkErr(os.WriteFile(path.Join(args.OutputDir, "favicon.ico"), favicon, 0666))
+}
+
+func HostRepo(data Repo) {
+	if data.HostGit {
+		debug("hosting of '%v' is ON", data.Name)
+		old := path.Join(data.CloneDir(), ".git")
+		new := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
+		debug("renaming '%v', new %v", data.Name, new)
+		checkErr(os.Rename(old, new))
+		debug("running 'git update-server-info' in %v", new)
+		cmd := exec.Command("git", "update-server-info")
+		cmd.Dir = new
+		checkErr(cmd.Run())
+		debug("hosting '%v' at %v", data.Name, new)
+	} else {
+		debug("hosting of '%v' is OFF", data.Name)
+	}
 }
 
 type LogWriter struct{}
