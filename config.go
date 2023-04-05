@@ -1,20 +1,42 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
-	SiteName string `toml:"site_name"`
-	Repos    []Repo
 	BaseURL  string `toml:"base_url"`
+	SiteName string `toml:"site_name"`
+	Repos    []Repo `toml:"repos"`
 }
 
 type Repo struct {
-	Name            string
-	Description     string
-	URL             string
+	Name            string `toml:"name"`
+	Description     string `toml:"description"`
+	URL             string `toml:"url"`
+	HostGit         bool   `toml:"host_git"`
 	PublishedGitURL string `toml:"published_git_url"`
+}
+
+// / CloneDir gets the directory that this repo was cloned into using the output directory
+// / from the program arguments, and this repo's name.
+func (r *Repo) CloneDir() string {
+	return path.Join(args.OutputDir, "git", r.Name)
+}
+
+func (r *Repo) FindFileInRoot(oneOfThese map[string]bool) string {
+	dir, err := os.ReadDir(r.CloneDir())
+	checkErr(err)
+	for _, e := range dir {
+		name := e.Name()
+		if _, ok := oneOfThese[name]; ok {
+			return name
+		}
+	}
+	return ""
 }
 
 func ParseConfiguration(data string) Config {
@@ -25,9 +47,8 @@ func ParseConfiguration(data string) Config {
 }
 
 type RepoData struct {
-	Name            string
+	Repo
 	PublishedGitURL string
-	Description     string
 	BaseURL         string
 	ReadMePath      string
 	LicenseFilePath string

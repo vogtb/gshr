@@ -45,7 +45,7 @@ func (f *FilePage) RenderPage(t *template.Template) {
 func RenderSingleFilePages(data RepoData) {
 	t, err := template.ParseFS(htmlTemplates, "templates/file.html", "templates/partials.html")
 	checkErr(err)
-	err = filepath.Walk(path.Join(args.CloneDir, data.Name), func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
@@ -54,7 +54,7 @@ func RenderSingleFilePages(data RepoData) {
 			ext := filepath.Ext(filename)
 			_, canRenderExtension := settings.TextExtensions[ext]
 			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
-			partialPath, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
+			partialPath, _ := strings.CutPrefix(filename, data.CloneDir())
 			outputName := path.Join(args.OutputDir, data.Name, "files", partialPath, "index.html")
 			(&FilePage{
 				RepoData:       data,

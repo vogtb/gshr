@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"path"
 
@@ -55,17 +54,11 @@ func Init() {
 	settings = DefaultSettings()
 	flag.StringVar(&args.ConfigFile, "config", "", "Config file.")
 	flag.StringVar(&args.OutputDir, "output", "", "Dir of output.")
-	flag.StringVar(&args.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
 	flag.BoolVar(&args.Silent, "silent", false, "Run in silent mode.")
 	flag.Parse()
 
-	if args.CloneDir == "" {
-		args.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
-	}
-
 	debug("config '%v'", args.ConfigFile)
 	debug("output '%v'", args.OutputDir)
-	debug("clone '%v'", args.CloneDir)
 	configFileBytes, err := os.ReadFile(args.ConfigFile)
 	configString := string(configFileBytes)
 	checkErr(err)
@@ -75,22 +68,21 @@ func Init() {
 }
 
 func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
-	err := os.MkdirAll(path.Join(args.CloneDir, repo.Name), 0755)
+	err := os.MkdirAll(repo.CloneDir(), 0755)
 	checkErr(err)
 	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
 	checkErr(err)
 	debug("cloning '%v'", repo.Name)
-	repoRef, err := git.PlainClone(path.Join(args.CloneDir, repo.Name), false, &git.CloneOptions{
+	repoRef, err := git.PlainClone(repo.CloneDir(), false, &git.CloneOptions{
 		URL: repo.URL,
 	})
 	checkErr(err)
 	data := RepoData{
-		Name:            repo.Name,
+		Repo:            repo,
 		PublishedGitURL: repo.PublishedGitURL,
-		Description:     repo.Description,
 		BaseURL:         config.BaseURL,
-		ReadMePath:      findFileInRoot(repo.Name, settings.AllowedReadMeFiles),
-		LicenseFilePath: findFileInRoot(repo.Name, settings.AllowedLicenseFiles),
+		ReadMePath:      repo.FindFileInRoot(settings.AllowedReadMeFiles),
+		LicenseFilePath: repo.FindFileInRoot(settings.AllowedLicenseFiles),
 	}
 	*r = *repoRef
 	return data
@@ -143,23 +135,10 @@ func highlight(pathOrExtension string, data *string) string {
 	return buf.String()
 }
 
-func findFileInRoot(name string, oneOfThese map[string]bool) string {
-	dir, err := os.ReadDir(path.Join(args.CloneDir, name))
-	checkErr(err)
-	for _, e := range dir {
-		name := e.Name()
-		if _, ok := oneOfThese[name]; ok {
-			return name
-		}
-	}
-	return ""
-}
-
 type CmdArgs struct {
 	Silent     bool
 	ConfigFile string
 	OutputDir  string
-	CloneDir   string
 }
 
 func DefaultCmdArgs() CmdArgs {
@@ -167,7 +146,6 @@ func DefaultCmdArgs() CmdArgs {
 		Silent:     true,
 		ConfigFile: "",
 		OutputDir:  "",
-		CloneDir:   "",
 	}
 }
 

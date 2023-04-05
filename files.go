@@ -34,7 +34,7 @@ func RenderAllFilesPage(data RepoData) {
 	t, err := template.ParseFS(htmlTemplates, "templates/files.html", "templates/partials.html")
 	checkErr(err)
 	files := make([]FileOverview, 0)
-	err = filepath.Walk(path.Join(args.CloneDir, data.Name), func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
@@ -42,7 +42,7 @@ func RenderAllFilesPage(data RepoData) {
 		if !info.IsDir() {
 			info, err := os.Stat(filename)
 			checkErr(err)
-			Name, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
+			Name, _ := strings.CutPrefix(filename, data.CloneDir())
 			Name, _ = strings.CutPrefix(Name, "/")
 			tf := FileOverview{
 				Origin: filename,

@@ -10,19 +10,16 @@ target:
 target/output: target
 	mkdir -p target/output
 
-target/cloning: target
-	mkdir -p target/cloning
-
 clean:
 	rm -rf target/*
 
 target/gshr.bin: Makefile target $(wildcard *.go)
 	go build -o target/gshr.bin $(wildcard *.go)
 
-build: Makefile target target/output target/cloning target/gshr.bin
+build: Makefile target target/output  target/gshr.bin
 	@# intentionally blank, proxy for prerequisite.
 
-dev: Makefile target target/output target/cloning target/gshr.bin
+dev: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
     --config=$(PWD)/gshr.toml \
     --output=$(PWD)/target/output \
@@ -30,7 +27,7 @@ dev: Makefile target target/output target/cloning target/gshr.bin
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
-dev-example-go-git: Makefile target target/output target/cloning target/gshr.bin
+dev-example-go-git: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
     --config=$(PWD)/examples/go-git.toml \
     --output=$(PWD)/target/output \
@@ -38,7 +35,7 @@ dev-example-go-git: Makefile target target/output target/cloning target/gshr.bin
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
-dev-example-gshr: Makefile target target/output target/cloning target/gshr.bin
+dev-example-gshr: Makefile target target/output  target/gshr.bin
 	./target/gshr.bin \
     --config=$(PWD)/examples/ghsr-simple.toml \
     --output=$(PWD)/target/output \
