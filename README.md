@@ -19,15 +19,15 @@ See for yourself.
 ```bash
 git clone https://github.com/vogtb/gshr
 cd gshr
-make dev-example-gshr
+make dev-example-gshr-simple
 ```
 
 Which basically runs this.
 
 ```bash
-gshr -c=examples/gshr-simple.toml --output=/tmp/gshr-output
-cd /tmp/gshr-output
-python3 -m http.server 8000
+./target/gshr.bin -c=example-config-gshr-simple.toml -o=target/output
+cd target/output
+python3 -m http.server 80
 ```
 
 See more examples in [tree/master/examples](tree/master/examples).

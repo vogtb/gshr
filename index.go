@@ -21,7 +21,7 @@ func (l *IndexPage) RenderPage(t *template.Template) {
 }
 
 func RenderIndexPage(repos []RepoData) {
-	t, err := template.ParseFS(htmlTemplates, "templates/index.html", "templates/partials.html")
+	t, err := template.ParseFS(htmlTemplates, "template.index.html", "template.partials.html")
 	checkErr(err)
 	(&IndexPage{
 		BaseURL:  config.BaseURL,

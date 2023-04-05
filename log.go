@@ -35,7 +35,7 @@ func (l *LogPage) RenderPage(t *template.Template) {
 }
 
 func RenderLogPage(data RepoData, r *git.Repository) {
-	t, err := template.ParseFS(htmlTemplates, "templates/log.html", "templates/partials.html")
+	t, err := template.ParseFS(htmlTemplates, "template.log.html", "template.partials.html")
 	checkErr(err)
 	commits := make([]LogPageCommit, 0)
 	ref, err := r.Head()

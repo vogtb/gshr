@@ -43,7 +43,7 @@ func (f *FilePage) RenderPage(t *template.Template) {
 }
 
 func RenderSingleFilePages(data RepoData) {
-	t, err := template.ParseFS(htmlTemplates, "templates/file.html", "templates/partials.html")
+	t, err := template.ParseFS(htmlTemplates, "template.file.html", "template.partials.html")
 	checkErr(err)
 	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {

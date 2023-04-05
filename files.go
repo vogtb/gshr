@@ -31,7 +31,7 @@ func (f *FilesPage) RenderPage(t *template.Template) {
 }
 
 func RenderAllFilesPage(data RepoData) {
-	t, err := template.ParseFS(htmlTemplates, "templates/files.html", "templates/partials.html")
+	t, err := template.ParseFS(htmlTemplates, "template.files.html", "template.partials.html")
 	checkErr(err)
 	files := make([]FileOverview, 0)
 	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {

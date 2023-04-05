@@ -13,6 +13,9 @@ target/output: target
 clean:
 	rm -rf target/*
 
+fmt:
+	go fmt
+
 target/gshr.bin: Makefile target $(wildcard *.go)
 	go build -o target/gshr.bin $(wildcard *.go)
 
@@ -20,16 +23,16 @@ build: Makefile target target/output  target/gshr.bin
 	@# intentionally blank, proxy for prerequisite.
 
 dev: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin -c=gshr.toml -o=target/output \
-    cd target/output && python3 -m http.server 80
+	./target/gshr.bin -c=dev-config-gshr.toml -o=target/output && \
+    cd target/output && \
+    python3 -m http.server 80
 
 dev-example-go-git: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin -c=examples/go-git.toml -o=target/output \
-    cd target/output && python3 -m http.server 80
+	./target/gshr.bin -c=example-config-gshr-simple.toml -o=target/output && \
+    cd target/output && \
+    python3 -m http.server 80
 
-dev-example-gshr: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin -c=examples/gshr-simple.toml -o=target/output \
-    cd target/output && python3 -m http.server 80
-
-fmt:
-	go fmt
+dev-example-gshr-simple: Makefile target target/output  target/gshr.bin
+	./target/gshr.bin -c=example-config-gshr-simple.toml -o=target/output && \
+    cd target/output && \
+    python3 -m http.server 80

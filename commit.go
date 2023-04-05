@@ -35,7 +35,7 @@ func (c *CommitPage) RenderPage(t *template.Template) {
 }
 
 func RenderAllCommitPages(data RepoData, r *git.Repository) {
-	t, err := template.ParseFS(htmlTemplates, "templates/commit.html", "templates/partials.html")
+	t, err := template.ParseFS(htmlTemplates, "template.commit.html", "template.partials.html")
 	checkErr(err)
 	ref, err := r.Head()
 	checkErr(err)

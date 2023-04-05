@@ -18,7 +18,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-//go:embed templates/*
+//go:embed template.*.html
 var htmlTemplates embed.FS
 
 //go:embed gshr.css
