@@ -7,8 +7,9 @@ import (
 )
 
 type IndexPage struct {
-	BaseURL string
-	Repos   []RepoData
+	BaseURL  string
+	SiteName string
+	Repos    []RepoData
 }
 
 func (l *IndexPage) Render(t *template.Template) {
@@ -22,7 +23,8 @@ func RenderIndexPage(repos []RepoData) {
 	t, err := template.ParseFS(htmlTemplates, "templates/index.html", "templates/partials.html")
 	checkErr(err)
 	(&IndexPage{
-		BaseURL: config.BaseURL,
-		Repos:   repos,
+		BaseURL:  config.BaseURL,
+		SiteName: config.SiteName,
+		Repos:    repos,
 	}).Render(t)
 }

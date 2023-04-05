@@ -130,6 +130,22 @@ func findFileInRoot(name string, oneOfThese map[string]bool) string {
 	return ""
 }
 
+type CmdArgs struct {
+	DebugOn    bool
+	ConfigFile string
+	OutputDir  string
+	CloneDir   string
+}
+
+func DefaultCmdArgs() CmdArgs {
+	return CmdArgs{
+		DebugOn:    true,
+		ConfigFile: "",
+		OutputDir:  "",
+		CloneDir:   "",
+	}
+}
+
 type Settings struct {
 	TextExtensions      map[string]bool
 	PlainFiles          map[string]bool
@@ -152,6 +168,9 @@ func DefaultSettings() Settings {
 			".dot":            true,
 			".eslintignore":   true,
 			".eslintrc":       true,
+			".bashrc":         true,
+			".zshrc":          true,
+			".zshprofile":     true,
 			".g4":             true,
 			".gitignore":      true,
 			".gitmodules":     true,

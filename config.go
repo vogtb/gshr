@@ -5,8 +5,9 @@ import (
 )
 
 type Config struct {
-	Repos   []Repo
-	BaseURL string `toml:"base_url"`
+	SiteName string `toml:"site_name"`
+	Repos    []Repo
+	BaseURL  string `toml:"base_url"`
 }
 
 type Repo struct {
@@ -21,22 +22,6 @@ func ParseConfiguration(data string) Config {
 	_, err := toml.Decode(data, &conf)
 	checkErr(err)
 	return conf
-}
-
-type CmdArgs struct {
-	DebugOn    bool
-	ConfigFile string
-	OutputDir  string
-	CloneDir   string
-}
-
-func DefaultCmdArgs() CmdArgs {
-	return CmdArgs{
-		DebugOn:    true,
-		ConfigFile: "",
-		OutputDir:  "",
-		CloneDir:   "",
-	}
 }
 
 type RepoData struct {

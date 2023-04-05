@@ -1,4 +1,5 @@
 base_url = "/"
+site_name = "public, self hosted git repositories"
 
 [[repos]]
 name = "gshr"
@@ -14,6 +15,6 @@ git_url = "git@git.vogt.world:vogtb/www.git"
 
 [[repos]]
 name = "f7"
-description = "F7 is the spreadsheet formula execution library"
+description = "f7 is a spreadsheet formula execution library"
 path = "/Users/bvogt/dev/src/ben/f7"
 git_url = "git@git.vogt.world:vogtb/f7.git"
