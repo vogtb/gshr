@@ -20,28 +20,16 @@ build: Makefile target target/output  target/gshr.bin
 	@# intentionally blank, proxy for prerequisite.
 
 dev: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin \
-    -c=gshr.toml \
-    -o=target/output \
-		&& \
-    cd $(PWD)/target/output && \
-    python3 -m http.server 8000
+	./target/gshr.bin -c=gshr.toml -o=target/output \
+    cd target/output && python3 -m http.server 80
 
 dev-example-go-git: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin \
-    -c=$(PWD)/examples/go-git.toml \
-    -c=$(PWD)/target/output \
-		&& \
-    cd $(PWD)/target/output && \
-    python3 -m http.server 8000
+	./target/gshr.bin -c=examples/go-git.toml -o=target/output \
+    cd target/output && python3 -m http.server 80
 
 dev-example-gshr: Makefile target target/output  target/gshr.bin
-	./target/gshr.bin \
-    -c=$(PWD)/examples/ghsr-simple.toml \
-    -o=$(PWD)/target/output \
-		&& \
-    cd $(PWD)/target/output && \
-    python3 -m http.server 8000
+	./target/gshr.bin -c=examples/gshr-simple.toml -o=target/output \
+    cd target/output && python3 -m http.server 80
 
 fmt:
 	go fmt

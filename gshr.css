@@ -254,6 +254,7 @@ div.content div.log {
   display: block;
 }
 
+div.content div.metadata table,
 div.content div.log table,
 div.content div.commit-detail table,
 div.content div.index table,

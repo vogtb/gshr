@@ -3,23 +3,29 @@
 > Git static host repo.
 
 Command line tool for generating stand-alone, static git html hosting. Produces a single output
-directory for multiple repos, with html files for most preview-able text files, commit log, and
-more.
+directory for multiple repos, with...
+
+* Root index.html that lists all input repos.
+* Commit log page for each repo.
+* Individual commit page summarizing commit including diff.
+* File list page for each repo for the current HEAD ref.
+* File detail/preview page for each file in current HEAD ref.
+* Statically clone-able git folder for each repo.
 
 ---
 
-See for yourself:
+See for yourself.
 
-```
+```bash
 git clone https://github.com/vogtb/gshr
 cd gshr
 make dev-example-gshr
 ```
 
-Which basically runs
+Which basically runs this.
 
 ```bash
-gshr --config=${PWD}/example-configs/gshr-simple.toml --output=/tmp/gshr-output
+gshr -c=examples/gshr-simple.toml --output=/tmp/gshr-output
 cd /tmp/gshr-output
 python3 -m http.server 8000
 ```
@@ -39,15 +45,14 @@ Usage of gshr:
 
 The toml file needs to be in the format:
 
-* `base_url`: String for base url that this site will be served from. Eg: `"/"` or
-  `"https://mysite.com/git/"`.  
-* `site_name`: String overall site name. Displayed on the main index.html page that lists all
-  repos.
+* `base_url`: Base url for the site. Eg: `"/"` or `"https://mysite.com/git/"`.  
+* `site_name`: Site name displayed on the main index.html page that lists all repos.
 * `repos` List of data for each repo.
-  * `name`: String for rendering the name of this repo.
-  * `description`: String for rendering the description.
-  * `url`: String of the local absolute path, `git://`, `http://`, or `https://` url of the repo.
-  * `published_git_url`: String of where the repo lives. Eg: `git@github.com:vogtb/gshr.git`
+  * `name`: Name of repo to be used in display, paths.
+  * `description`: Description of repo used in html pages.
+  * `url`: Absolute, relative, or remote. eg: `/home/repo`, `./repo`, `git://`, `http://`.
+  * `published_git_url`: Optional Link to where the repo lives. Eg: `github.com/vogtb/gshr`.
+  * `host_git`: Bool of whether we should package the repo up into `{name}.git` and host it.
 
 ---
 
@@ -101,3 +106,29 @@ output
 ├── gshr.css
 └── index.html
 ```
+
+---
+
+# License
+
+The MIT License (MIT)
+
+Copyright (c) 2023 Ben Vogt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
