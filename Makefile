@@ -13,8 +13,14 @@ target/output: target
 clean:
 	rm -rf target/*
 
+deps:
+	go mod download
+
 fmt:
 	go fmt
+
+install:
+	go install
 
 target/gshr.bin: Makefile target $(wildcard *.go)
 	go build -o target/gshr.bin $(wildcard *.go)

@@ -30,7 +30,7 @@ cd target/output
 python3 -m http.server 80
 ```
 
-See more examples in [tree/master/examples](tree/master/examples).
+See example TOML configs in root directory.
 
 ---
 
@@ -53,6 +53,20 @@ The toml file needs to be in the format:
   * `url`: Absolute, relative, or remote. eg: `/home/repo`, `./repo`, `git://`, `http://`.
   * `published_git_url`: Optional Link to where the repo lives. Eg: `github.com/vogtb/gshr`.
   * `host_git`: Bool of whether we should package the repo up into `{name}.git` and host it.
+
+For example:
+
+```toml
+base_url = "http://localhost/"
+site_name = "public, self hosted git repositories"
+
+[[repos]]
+name = "gshr"
+description = "git static host repo -- generates static html for repos"
+url = "https://github.com/vogtb/gshr"
+published_git_url = "https://github.com/vogtb/gshr"
+host_git = true
+```
 
 ---
 
