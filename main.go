@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"path"
@@ -41,10 +42,12 @@ func main() {
 }
 
 func Init() {
+	log.SetFlags(0)
+	log.SetOutput(new(LogWriter))
 	args = DefaultCmdArgs()
 	settings = DefaultSettings()
 	flag.StringVar(&args.ConfigFile, "config", "", "Config file.")
-	flag.BoolVar(&args.DebugOn, "debug", true, "Run in debug mode.")
+	flag.BoolVar(&args.Silent, "silent", false, "Run in silent mode.")
 	flag.StringVar(&args.OutputDir, "output", "", "Dir of output.")
 	flag.StringVar(&args.CloneDir, "clone", "", "Dir to clone into. Default is /tmp/${rand}")
 	flag.Parse()
@@ -53,13 +56,15 @@ func Init() {
 		args.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
 	}
 
-	debug("config = %v", args.ConfigFile)
-	debug("output = %v", args.OutputDir)
-	debug("clone = %v", args.CloneDir)
-	configFileByes, err := os.ReadFile(args.ConfigFile)
+	debug("config %v", args.ConfigFile)
+	debug("output %v", args.OutputDir)
+	debug("clone %v", args.CloneDir)
+	configFileBytes, err := os.ReadFile(args.ConfigFile)
+	configString := string(configFileBytes)
 	checkErr(err)
-	config = ParseConfiguration(string(configFileByes))
-	debug("base_url = %v", config.BaseURL)
+	config = ParseConfiguration(configString)
+	debug("base_url %v", config.BaseURL)
+	debug("site_name %v", config.SiteName)
 }
 
 func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
@@ -83,17 +88,22 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 	return data
 }
 
+type LogWriter struct{}
+
+func (writer LogWriter) Write(bytes []byte) (int, error) {
+	return fmt.Print(string(bytes))
+}
+
 func checkErr(err error) {
 	if err != nil {
-		fmt.Printf("ERROR: %v\n", err)
+		log.Printf("ERROR: %v", err)
 		os.Exit(1)
 	}
 }
 
 func debug(format string, a ...any) {
-	if args.DebugOn {
-		fmt.Printf(format, a...)
-		fmt.Print("\n")
+	if !args.Silent {
+		log.Printf("DEBUG: "+format, a...)
 	}
 }
 
@@ -131,7 +141,7 @@ func findFileInRoot(name string, oneOfThese map[string]bool) string {
 }
 
 type CmdArgs struct {
-	DebugOn    bool
+	Silent     bool
 	ConfigFile string
 	OutputDir  string
 	CloneDir   string
@@ -139,7 +149,7 @@ type CmdArgs struct {
 
 func DefaultCmdArgs() CmdArgs {
 	return CmdArgs{
-		DebugOn:    true,
+		Silent:     true,
 		ConfigFile: "",
 		OutputDir:  "",
 		CloneDir:   "",

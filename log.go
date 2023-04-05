@@ -27,6 +27,7 @@ type LogPage struct {
 }
 
 func (l *LogPage) Render(t *template.Template) {
+	debug("log page for '%v'", l.RepoData.Name)
 	output, err := os.Create(path.Join(args.OutputDir, l.RepoData.Name, "log.html"))
 	checkErr(err)
 	err = t.Execute(output, l)

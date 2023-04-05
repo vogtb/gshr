@@ -23,6 +23,7 @@ type FilesPage struct {
 }
 
 func (f *FilesPage) Render(t *template.Template) {
+	debug("file page for '%v'", f.RepoData.Name)
 	output, err := os.Create(path.Join(args.OutputDir, f.RepoData.Name, "files.html"))
 	checkErr(err)
 	err = t.Execute(output, f)

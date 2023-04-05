@@ -10,9 +10,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-type FileDiff struct {
-}
-
 type CommitPage struct {
 	RepoData        RepoData
 	Author          string
@@ -28,6 +25,7 @@ type CommitPage struct {
 }
 
 func (c *CommitPage) Render(t *template.Template) {
+	debug("commit %v %v", c.RepoData.Name, c.Hash)
 	err := os.MkdirAll(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash), 0755)
 	checkErr(err)
 	output, err := os.Create(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash, "index.html"))

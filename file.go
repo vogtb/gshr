@@ -23,6 +23,7 @@ type FilePage struct {
 }
 
 func (f *FilePage) Render(t *template.Template) {
+	debug("file %v%v", f.RepoData.Name, f.Name)
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
 	if f.CanRender {
@@ -55,9 +56,9 @@ func RenderSingleFilePages(data RepoData) {
 			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
 			partialPath, _ := strings.CutPrefix(filename, path.Join(args.CloneDir, data.Name))
 			outputName := path.Join(args.OutputDir, data.Name, "files", partialPath, "index.html")
-			debug("reading %v %v", data.Name, partialPath)
 			(&FilePage{
 				RepoData:       data,
+				Name:           partialPath,
 				Extension:      ext,
 				CanRender:      canRenderExtension || canRenderByFullName,
 				Origin:         filename,
