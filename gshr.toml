@@ -11,3 +11,9 @@ name = "www"
 description = "static site for www.vogt.world"
 path = "/Users/bvogt/dev/src/ben/www"
 git_url = "git@git.vogt.world:vogtb/www.git"
+
+[[repos]]
+name = "f7"
+description = "F7 is the spreadsheet formula execution library"
+path = "/Users/bvogt/dev/src/ben/f7"
+git_url = "git@git.vogt.world:vogtb/f7.git"
