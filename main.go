@@ -20,6 +20,12 @@ import (
 //go:embed templates/*
 var htmlTemplates embed.FS
 
+//go:embed gshr.css
+var css []byte
+
+//go:embed favicon.ico
+var favicon []byte
+
 var args CmdArgs
 
 var config Config
@@ -39,6 +45,7 @@ func main() {
 		RenderSingleFilePages(data)
 	}
 	RenderIndexPage(allRepoData)
+	RenderAssets()
 }
 
 func Init() {
@@ -72,6 +79,7 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 	checkErr(err)
 	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
 	checkErr(err)
+	debug("cloning '%v'", repo.Name)
 	repoRef, err := git.PlainClone(path.Join(args.CloneDir, repo.Name), false, &git.CloneOptions{
 		URL: repo.URL,
 	})
@@ -86,6 +94,13 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 	}
 	*r = *repoRef
 	return data
+}
+
+func RenderAssets() {
+	debug("rendering gshr.css")
+	debug("rendering favicon.ico")
+	checkErr(os.WriteFile(path.Join(args.OutputDir, "gshr.css"), css, 0666))
+	checkErr(os.WriteFile(path.Join(args.OutputDir, "favicon.ico"), favicon, 0666))
 }
 
 type LogWriter struct{}

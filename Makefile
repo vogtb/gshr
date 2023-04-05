@@ -26,32 +26,23 @@ dev: Makefile target target/output target/cloning target/gshr.bin
 	./target/gshr.bin \
     --config=$(PWD)/gshr.toml \
     --output=$(PWD)/target/output \
-    --clone=$(PWD)/target/cloning \
 		&& \
-    cp gshr.css $(PWD)/target/output/ && \
-    cp favicon.ico $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
 dev-example-go-git: Makefile target target/output target/cloning target/gshr.bin
 	./target/gshr.bin \
-    --config=$(PWD)/example/go-git.toml \
+    --config=$(PWD)/examples/go-git.toml \
     --output=$(PWD)/target/output \
-    --clone=$(PWD)/target/cloning \
 		&& \
-    cp gshr.css $(PWD)/target/output/ && \
-    cp favicon.ico $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
 dev-example-gshr: Makefile target target/output target/cloning target/gshr.bin
 	./target/gshr.bin \
-    --config=$(PWD)/example/gshr-simple.toml \
+    --config=$(PWD)/examples/ghsr-simple.toml \
     --output=$(PWD)/target/output \
-    --clone=$(PWD)/target/cloning \
 		&& \
-    cp gshr.css $(PWD)/target/output/ && \
-    cp favicon.ico $(PWD)/target/output/ && \
     cd $(PWD)/target/output && \
     python3 -m http.server 8000
 
