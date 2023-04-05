@@ -56,15 +56,15 @@ func Init() {
 		args.CloneDir = fmt.Sprintf("/tmp/gshr-temp-clone-%v", rand.Uint32())
 	}
 
-	debug("config %v", args.ConfigFile)
-	debug("output %v", args.OutputDir)
-	debug("clone %v", args.CloneDir)
+	debug("config '%v'", args.ConfigFile)
+	debug("output '%v'", args.OutputDir)
+	debug("clone '%v'", args.CloneDir)
 	configFileBytes, err := os.ReadFile(args.ConfigFile)
 	configString := string(configFileBytes)
 	checkErr(err)
 	config = ParseConfiguration(configString)
-	debug("base_url %v", config.BaseURL)
-	debug("site_name %v", config.SiteName)
+	debug("base_url '%v'", config.BaseURL)
+	debug("site_name '%v'", config.SiteName)
 }
 
 func CloneAndGetData(repo Repo, r *git.Repository) RepoData {

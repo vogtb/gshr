@@ -1,9 +1,6 @@
 # Copyright 2023 Ben Vogt. All rights reserved.
 
 PWD := $(shell pwd)
-OS ?= darwin
-ARCH ?= arm64
-ENVIRONMENT ?= development
 
 rfind=$(shell find $1 -type f -not -path "./target/*")
 
@@ -19,15 +16,37 @@ target/cloning: target
 clean:
 	rm -rf target/*
 
-target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin: Makefile target $(wildcard *.go)
-	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin $(wildcard *.go)
+target/gshr.bin: Makefile target $(wildcard *.go)
+	go build -o target/gshr.bin $(wildcard *.go)
 
-build: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
+build: Makefile target target/output target/cloning target/gshr.bin
 	@# intentionally blank, proxy for prerequisite.
 
-dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
-	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
+dev: Makefile target target/output target/cloning target/gshr.bin
+	./target/gshr.bin \
     --config=$(PWD)/gshr.toml \
+    --output=$(PWD)/target/output \
+    --clone=$(PWD)/target/cloning \
+		&& \
+    cp gshr.css $(PWD)/target/output/ && \
+    cp favicon.ico $(PWD)/target/output/ && \
+    cd $(PWD)/target/output && \
+    python3 -m http.server 8000
+
+dev-example-go-git: Makefile target target/output target/cloning target/gshr.bin
+	./target/gshr.bin \
+    --config=$(PWD)/example/go-git.toml \
+    --output=$(PWD)/target/output \
+    --clone=$(PWD)/target/cloning \
+		&& \
+    cp gshr.css $(PWD)/target/output/ && \
+    cp favicon.ico $(PWD)/target/output/ && \
+    cd $(PWD)/target/output && \
+    python3 -m http.server 8000
+
+dev-example-gshr: Makefile target target/output target/cloning target/gshr.bin
+	./target/gshr.bin \
+    --config=$(PWD)/example/gshr-simple.toml \
     --output=$(PWD)/target/output \
     --clone=$(PWD)/target/cloning \
 		&& \

@@ -8,6 +8,26 @@ more.
 
 ---
 
+See for yourself:
+
+```
+git clone https://github.com/vogtb/gshr
+cd gshr
+make dev-example-gshr
+```
+
+Which basically runs
+
+```bash
+gshr --config=${PWD}/example-configs/gshr-simple.toml --output=/tmp/gshr-output
+cd /tmp/gshr-output
+python3 -m http.server 8000
+```
+
+See more examples in [tree/master/examples](tree/master/examples).
+
+---
+
 ## Usage
 
 ```
