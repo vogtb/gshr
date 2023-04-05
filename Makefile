@@ -22,6 +22,9 @@ clean:
 target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin: Makefile target $(wildcard *.go)
 	go build -o target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin $(wildcard *.go)
 
+build: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
+	@# intentionally blank, proxy for prerequisite.
+
 dev: Makefile target target/output target/cloning target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin
 	./target/gshr-${OS}-${ARCH}-${ENVIRONMENT}.bin \
     --config=$(PWD)/gshr.toml \
