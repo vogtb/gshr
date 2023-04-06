@@ -8,6 +8,16 @@
 <body>
   <div class="content">
     {{ template "metadata" .RepoData }}
+    <r-cell span="16">
+      <div style="padding-bottom: 4px;">
+        <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/files.html">
+          <span>
+            ←
+            All files
+          </span>
+        </a>
+      </div>
+    </r-cell>
     <div class="file">
       {{ if .CanRender }}
       {{ .Content }}

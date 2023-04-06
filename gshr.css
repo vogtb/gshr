@@ -4,7 +4,6 @@
   --sans-font: -apple-system, BlinkMacSystemFont, "avenir next", avenir,
     helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial,
     sans-serif;
-  --serif-font: "Times New Roman", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   /* Colors */
   --blue: #0062ff;
   /* General variables */
@@ -18,11 +17,6 @@
   --second-text-color: #838181;
   --link-color: var(--blue);
   --link-underline-color: var(--blue);
-  --bg: white;
-  --blockquote-color: #606060;
-  --blockquote-border: #424242;
-  --log-hr: #c2c2c2;
-  --hr: rgba(0, 0, 0, 0.50);
 }
 
 html {
@@ -56,13 +50,7 @@ body {
   font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
 }
 
-p,
-ul,
-ol,
-pre,
-blockquote,
-hr,
-object {
+pre {
   margin: 0.31rem 0
 }
 
@@ -73,46 +61,9 @@ tt {
   font-feature-settings: 'ss02' 1, 'zero' 1
 }
 
-img {
-  border: none;
-  vertical-align: bottom
-}
-
-.img-border {
-  border: solid 1px rgb(222, 221, 222)
-}
-
-hr {
-  height: 1px;
-  border: none;
-  background-color: var(--hr)
-}
-
 strong,
 b {
   font-weight: 600
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-size: inherit;
-  font-weight: 600
-}
-
-h1 {
-  margin-bottom: 1.5em
-}
-
-h1,
-h2 {
-  line-height: 1.25;
-  font-weight: 600;
-  font-size: 24px;
-  letter-spacing: .009em
 }
 
 a[href] {
@@ -132,38 +83,6 @@ a[href]:hover {
   text-decoration-color: var(--link-color)
 }
 
-a.img {
-  border: none;
-  background: transparent !important
-}
-
-h1>a,
-h2>a,
-h3>a,
-h4>a,
-h5>a,
-h6>a,
-h1>a:hover,
-h2>a:hover,
-h3>a:hover,
-h4>a:hover,
-h5>a:hover,
-h6>a:hover {
-  color: inherit !important;
-  background-color: transparent !important;
-  text-decoration-style: solid;
-  text-decoration-line: underline;
-  text-decoration-color: var(--link-color);
-  text-decoration-thickness: 2px
-}
-
-@media screen and (max-width: 920px) {
-  div.content {
-    margin: 0 auto;
-    padding: 20px;
-  }
-}
-
 .mono {
   font-family: var(--mono-font);
 }
@@ -181,133 +100,31 @@ div.content {
   max-width: 860px
 }
 
-div.content:not(.sub) h1:first-child {
-  margin-top: 0
-}
-
-div.content img,
-div.content iframe {
-  display: block;
-  max-width: 100%;
-  margin: 0 0 1em
-}
-
-div.content iframe {
-  border: none
-}
-
-div.content li {
-  margin-left: 2em;
-  margin-bottom: 0.2em
-}
-
-div.content ul>li {
-  margin-left: 1.4em
-}
-
-div.content blockquote {
-  border-left: 4px solid var(--blockquote-border);
-  padding: 0 0 0 20px;
-  color: var(--blockquote-color);
-  font-style: italic;
-  letter-spacing: 0.002em;
-  font-family: var(--serif-font);
-  font-size: 1.1em
-}
-
-div.content div.file {
-  padding: 0 0.4em;
-}
-
-div.content pre {
+pre {
   overflow-x: auto;
   padding: 0.4em;
   border: solid 1px gainsboro;
   border-radius: 4px;
 }
 
-div.content pre>code {
+pre>code {
   padding: 0;
   background-color: transparent;
   border-radius: 0
 }
 
-div.content pre>code::before,
-div.content pre>code::after {
+pre>code::before,
+pre>code::after {
   letter-spacing: inherit;
   content: none
 }
 
-div.content *:target {
+*:target {
   outline: 4px solid #fe0
 }
 
-div.content div.metadata {
+div.metadata {
   padding-bottom: 1em;
-}
-
-div.content div.metadata h1 {
-  font-size: 1em;
-  margin: 0;
-}
-
-div.content div:not(.metadata) * tr:hover {
-  background: #efefef;
-}
-
-div.content div.log .commit {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis
-}
-
-div.content div.log {
-  display: block;
-}
-
-div.content div.metadata table,
-div.content div.log table,
-div.content div.commit-detail table,
-div.content div.index table,
-div.content div.files table {
-  vertical-align: top;
-  white-space: nowrap;
-  width: 100%;
-}
-
-div.content div.log table,
-div.content div.commit-detail table,
-div.content div.files table {
-  font-family: var(--mono-font);
-}
-
-div.content div.index table td.name {
-  width: 130px;
-  max-width: 130px;
-  min-width: 50px;
-}
-
-div.content div.index table td.description {
-  width: 300px;
-  max-width: 300px;
-  min-width: 220px;
-}
-
-div.content * table {
-  border-collapse: separate;
-  border-spacing: 2px 4px;
-}
-
-div.content * td>* {
-  padding: 2px;
-}
-
-div.content * td>* {
-  max-width: 380px;
-  vertical-align: top;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .chroma {

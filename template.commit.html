@@ -9,46 +9,72 @@
   <div class="content">
     {{ template "metadata" .RepoData }}
     <div class="commit-detail">
-      <table>
-        <tbody>
-          <tr>
-            <td><b>commit: </b></td>
-            <td>
-              <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/commit/{{ .Hash }}/">
-                {{ .Hash }}
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td><b>author: </b></td>
-            <td>{{ .Author }} &lt;{{ .AuthorEmail }}&gt;</td>
-          </tr>
-          <tr>
-            <td><b>date: </b></td>
-            <td> {{ .Date }}</td>
-          </tr>
-          <tr>
-            <td><b>message: </b></td>
-            <td> {{ .Message }}</td>
-          </tr>
-          <tr>
-            <td><b>stats: </b></td>
-            <td>
-              {{ .FileChangeCount }} file(s) changed,
-              {{ .LinesAdded }} insertions(+),
-              {{ .LinesDeleted }} deletions(-)
-            </td>
-          </tr>
-          <tr>
-            <td><b>files: </b></td>
-            <td>
-              {{ range .FilesChanged }}
-              <div>{{ . }}</div>
-              {{ end }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <r-cell span="16">
+        <div style="padding-bottom: 4px;">
+          <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/log.html">
+            <span>
+              ←
+              Commit log
+            </span>
+          </a>
+        </div>
+      </r-cell>
+      <r-grid columns="16" style="gap: 2px;">
+        <r-cell span="2">
+          <div class="ellipsis"><b>commit</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/commit/{{ .Hash }}/">
+              {{ .Hash }}
+            </a>
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>message</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            {{ .Message }}
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>author</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            {{ .Author }} &lt;{{ .AuthorEmail }}&gt;
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>date</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            {{ .Date }}
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>stats</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            {{ .FileChangeCount }} file(s) changed,
+            {{ .LinesAdded }} insertions(+),
+            {{ .LinesDeleted }} deletions(-)
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>files</b></div>
+        </r-cell>
+        <r-cell span="14">
+          <div class="mono ellipsis">
+            {{ range .FilesChanged }}
+            <div>{{ . }}</div>
+            {{ end }}
+          </div>
+        </r-cell>
+      </r-grid>
       {{ .DiffContent }}
     </div>
   </div>

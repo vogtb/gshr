@@ -10,61 +10,54 @@
 
 {{ define "metadata" }}
 <div class="metadata">
-  <table>
-    <tbody>
-      <tr>
-        <td>
-          <a href="{{ .HeadData.BaseURL }}">
-            <span>
-              ←
-              Back to main page
-            </span>
-          </a>
-        </td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-      <tr>
-        <td>
-          <h1>{{ .Name }}</h1>
-          <span class="desc">
-            {{ .Description }}
+  <r-grid columns="12" style="gap: 2px;">
+    <r-cell span="12">
+      <div class="ellipsis">
+        <a href="{{ .HeadData.BaseURL }}">
+          <span>
+            ←
+            Back to main page
           </span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          git clone {{ .HeadData.BaseURL }}{{ .Name }}.git
-        </td>
-      </tr>
-      {{ if not (eq .PublishedGitURL "") }}
-      <tr>
-        <td>
-          alt url: <a href="{{ .PublishedGitURL }}">{{ .PublishedGitURL }}</a>
-        </td>
-      </tr>
-      {{ end }}
-      <tr>
-        <td>
-          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/log.html">Log</a>
-          |
-          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files.html">Files</a>
-          {{ if not (eq .ReadMePath "") }}
-          |
-          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .ReadMePath }}/index.html">
-            {{ .ReadMePath }}
-          </a>
-          {{ end }}
-          {{ if not (eq .LicenseFilePath "") }}
-          |
-          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .LicenseFilePath }}/index.html">
-            {{ .LicenseFilePath }}
-          </a>
-          {{ end }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        </a>
+      </div>
+    </r-cell>
+    <r-cell span="12" style="padding-top: 12px;">
+      <div class="ellipsis">
+        <div><b>{{ .Name }}</b></div>
+        <div>{{ .Description }}</div>
+      </div>
+    </r-cell>
+    <r-cell span="12">
+      <div class="mono ellipsis">
+        git clone {{ .HeadData.BaseURL }}{{ .Name }}.git
+      </div>
+    </r-cell>
+    {{ if not (eq .PublishedGitURL "") }}
+    <r-cell span="12">
+      <div class="ellipsis">
+        alt url: <a href="{{ .PublishedGitURL }}">{{ .PublishedGitURL }}</a>
+      </div>
+    </r-cell>
+    {{ end }}
+    <r-cell span="12">
+      <div>
+        <a href="{{ .HeadData.BaseURL }}{{ .Name }}/log.html">Log</a>
+        |
+        <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files.html">Files</a>
+        {{ if not (eq .ReadMePath "") }}
+        |
+        <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .ReadMePath }}/index.html">
+          {{ .ReadMePath }}
+        </a>
+        {{ end }}
+        {{ if not (eq .LicenseFilePath "") }}
+        |
+        <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .LicenseFilePath }}/index.html">
+          {{ .LicenseFilePath }}
+        </a>
+        {{ end }}
+      </div>
+    </r-cell>
+  </r-grid>
 </div>
 {{ end }}
