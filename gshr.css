@@ -270,8 +270,28 @@ div.content div.files table {
   font-family: var(--mono-font);
 }
 
-div.content * td {
-  padding: 0 0.4em;
+div.content div.index table td.name {
+  width: 130px;
+  max-width: 130px;
+  min-width: 50px;
+}
+
+div.content div.index table td.description {
+  width: 300px;
+  max-width: 300px;
+  min-width: 220px;
+}
+
+div.content * table {
+  border-collapse: separate;
+  border-spacing: 2px 4px;
+}
+
+div.content * td>* {
+  padding: 2px;
+}
+
+div.content * td>* {
   max-width: 380px;
   vertical-align: top;
   overflow: hidden;
