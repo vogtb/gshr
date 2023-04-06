@@ -12,27 +12,29 @@
     </div>
     <div>
       <div class="metadata">
-        <r-grid columns="12">
-          <r-cell span="2">
+        <r-grid columns="20" style="gap: 2px;">
+          <r-cell span="5">
             <b>Name</b>
           </r-cell>
-          <r-cell span="7">
+          <r-cell span="8">
             <b>Description</b>
           </r-cell>
-          <r-cell span="3">
+          <r-cell span="7">
             <b>Git</b>
           </r-cell>
 
           {{ range .Repos }}
-          <r-cell span="2">
-            <a href="{{ $.HeadData.BaseURL }}{{ .Name }}/log.html">
-              {{ .Name }}
-            </a>
+          <r-cell span="5">
+            <div class="ellipsis">
+              <a href="{{ $.HeadData.BaseURL }}{{ .Name }}/log.html">
+                {{ .Name }}
+              </a>
+            </div>
+          </r-cell>
+          <r-cell span="8">
+            <div class="ellipsis">{{ .Description }}</div>
           </r-cell>
           <r-cell span="7">
-            <div>{{ .Description }}</div>
-          </r-cell>
-          <r-cell span="3">
             <div class="ellipsis">
               {{ if .HostGit }}
               <a class="mono" href="{{ .BaseURL }}{{ .Name }}.git">

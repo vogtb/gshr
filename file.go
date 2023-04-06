@@ -24,7 +24,7 @@ type FilePage struct {
 }
 
 func (f *FilePage) RenderPage(t *template.Template) {
-	debug("file %v%v", f.RepoData.Name, f.Name)
+	debug("file %v %v", f.RepoData.Name, f.Name)
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
 	err = os.MkdirAll(filepath.Dir(f.Destination), 0775)
