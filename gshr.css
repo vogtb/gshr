@@ -50,10 +50,6 @@ body {
   font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
 }
 
-pre {
-  margin: 0.31rem 0
-}
-
 pre,
 code,
 tt {
@@ -101,8 +97,9 @@ div.content {
 }
 
 pre {
+  margin: 4px 0;
   overflow-x: auto;
-  padding: 0.4em;
+  padding: 4px;
   border: solid 1px gainsboro;
   border-radius: 4px;
 }

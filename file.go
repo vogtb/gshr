@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io/fs"
 	"os"
@@ -26,14 +27,6 @@ func (f *FilePage) RenderPage(t *template.Template) {
 	debug("file %v%v", f.RepoData.Name, f.Name)
 	err := os.MkdirAll(f.DestinationDir, 0775)
 	checkErr(err)
-	if f.CanRender {
-		fileBytes, err := os.ReadFile(f.Origin)
-		checkErr(err)
-		fileStr := string(fileBytes)
-		highlighted := highlight(f.DestinationDir, &fileStr)
-		checkErr(err)
-		f.Content = template.HTML(highlighted)
-	}
 	err = os.MkdirAll(filepath.Dir(f.Destination), 0775)
 	checkErr(err)
 	output, err := os.Create(f.Destination)
@@ -54,16 +47,32 @@ func RenderSingleFilePages(data RepoData) {
 			ext := filepath.Ext(filename)
 			_, canRenderExtension := settings.TextExtensions[ext]
 			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
+			canRender := canRenderExtension || canRenderByFullName
 			partialPath, _ := strings.CutPrefix(filename, data.CloneDir())
+			destDir := path.Join(args.OutputDir, data.Name, "files", partialPath)
 			outputName := path.Join(args.OutputDir, data.Name, "files", partialPath, "index.html")
+			var content template.HTML
+			info, err := os.Stat(filename)
+			checkErr(err)
+			if canRender {
+				fileBytes, err := os.ReadFile(filename)
+				checkErr(err)
+				fileStr := string(fileBytes)
+				highlighted := highlight(destDir, &fileStr)
+				checkErr(err)
+				content = template.HTML(highlighted)
+			}
 			(&FilePage{
 				RepoData:       data,
-				Name:           partialPath,
+				Mode:           info.Mode().String(),
+				Size:           fmt.Sprintf("%v", info.Size()),
+				Name:           strings.TrimPrefix(partialPath, "/"),
 				Extension:      ext,
-				CanRender:      canRenderExtension || canRenderByFullName,
+				CanRender:      canRender,
 				Origin:         filename,
 				Destination:    outputName,
-				DestinationDir: path.Join(args.OutputDir, data.Name, "files", partialPath),
+				DestinationDir: destDir,
+				Content:        content,
 			}).RenderPage(t)
 		}
 		return nil

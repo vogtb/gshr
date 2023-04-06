@@ -8,17 +8,29 @@
 <body>
   <div class="content">
     {{ template "metadata" .RepoData }}
-    <r-cell span="16">
-      <div style="padding-bottom: 4px;">
-        <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/files.html">
-          <span>
-            ←
-            All files
-          </span>
-        </a>
-      </div>
-    </r-cell>
-    <div class="file">
+    <div style="padding-bottom: 10px;">
+      <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/files.html">
+        <span>
+          ←
+          All files
+        </span>
+      </a>
+    </div>
+    <r-grid columns="12" style="gap: 2px; padding-bottom: 4px;">
+      <r-cell span="9">
+        <div class="ellipsis">
+          <b>name: </b>
+          <span class="mono">{{ .Name }}</span>
+        </div>
+      </r-cell>
+      <r-cell span="2">
+        <div align="right" class="mono ellipsis">{{ .Mode }}</div>
+      </r-cell>
+      <r-cell span="1">
+        <div align="right" class="mono ellipsis">{{ .Size }}</div>
+      </r-cell>
+    </r-grid>
+    <div>
       {{ if .CanRender }}
       {{ .Content }}
       {{ else }}
