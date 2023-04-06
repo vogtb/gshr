@@ -8,35 +8,64 @@
 <body>
   <div class="content">
     {{ template "metadata" .RepoData }}
-    <div class="log">
-      <table>
-        <thead>
-          <tr>
-            <td><b>Date</b></td>
-            <td><b>Commit message</b></td>
-            <td><b>Author</b></td>
-            <td align="right"><b>Files</b></td>
-            <td align="right"><b>+</b></td>
-            <td align="right"><b>-</b></td>
-          </tr>
-        </thead>
-        <tbody>
-          {{ range .Commits }}
-          <tr>
-            <td>{{ .Date }}</td>
-            <td class="commit">
-              <a href="{{ $.RepoData.BaseURL }}{{ $.RepoData.Name }}/commit/{{ .Hash }}">
-                {{ .Message }}
-              </a>
-            </td>
-            <td>{{ .Author }}</td>
-            <td align="right">{{ .FileChangeCount }}</td>
-            <td align="right">+{{ .LinesAdded }}</td>
-            <td align="right">-{{ .LinesDeleted }}</td>
-          </tr>
-          {{ end }}
-        </tbody>
-      </table>
+    <div class="log mono">
+      <r-grid columns="16">
+        <r-cell span="3">
+          <div class="ellipsis"><b>Date</b></div>
+        </r-cell>
+        <r-cell span="8">
+          <div class="ellipsis"><b>Commit</b></div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis"><b>Author</b></div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right">
+            <div class="ellipsis"><b>Files</b></div>
+          </div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right">
+            <b>-</b>
+          </div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right">
+            <b>-</b>
+          </div>
+        </r-cell>
+
+        {{ range .Commits }}
+        <r-cell span="3">
+          <div class="ellipsis">{{ .Date }}</div>
+        </r-cell>
+        <r-cell span="8">
+          <div class="ellipsis">
+            <a href="{{ $.RepoData.BaseURL }}{{ $.RepoData.Name }}/commit/{{ .Hash }}">
+              {{ .Message }}
+            </a>
+          </div>
+        </r-cell>
+        <r-cell span="2">
+          <div class="ellipsis">{{ .Author }}</div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right" class="ellipsis">
+            {{ .FileChangeCount }}
+          </div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right" class="ellipsis">
+            {{ .LinesAdded }}
+          </div>
+        </r-cell>
+        <r-cell span="1">
+          <div align="right" class="ellipsis">
+            {{ .LinesDeleted }}
+          </div>
+        </r-cell>
+        {{ end }}
+      </r-grid>
     </div>
   </div>
 </body>

@@ -164,6 +164,17 @@ h6>a:hover {
   }
 }
 
+.mono {
+  font-family: var(--mono-font);
+}
+
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 4px;
+}
+
 div.content {
   margin: 0 auto;
   padding: 20px;

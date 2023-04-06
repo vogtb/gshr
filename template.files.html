@@ -8,30 +8,34 @@
 <body>
   <div class="content">
     {{ template "metadata" .RepoData }}
-    <div class="files">
-      <table>
-        <thead>
-          <tr>
-            <td><b>Mode</b></td>
-            <td><b>Name</b></td>
-            <td><b>Size</b></td>
-          </tr>
-        </thead>
-        <tbody>
-          {{ range .Files }}
-          <tr>
-            <td>{{ .Mode }}</td>
-            <td>
-              <a
-                 href="{{ $.RepoData.HeadData.BaseURL }}{{ $.RepoData.Name }}/files/{{ .Name }}/index.html">
-                {{ .Name }}
-              </a>
-            </td>
-            <td>{{ .Size }}</td>
-          </tr>
-          {{ end }}
-        </tbody>
-      </table>
+    <div class="files mono">
+      <r-grid columns="16">
+        <r-cell span="11">
+          <div class="ellipsis"><b>Name</b></div>
+        </r-cell>
+        <r-cell span="3">
+          <div align="right" class="ellipsis"><b>Mode</b></div>
+        </r-cell>
+        <r-cell span="2">
+          <div align="right" class="ellipsis"><b>Size</b></div>
+        </r-cell>
+        {{ range .Files }}
+        <r-cell span="11">
+          <div class="ellipsis">
+            <a
+               href="{{ $.RepoData.HeadData.BaseURL }}{{ $.RepoData.Name }}/files/{{ .Name }}/index.html">
+              {{ .Name }}
+            </a>
+          </div>
+        </r-cell>
+        <r-cell span="3">
+          <div align="right" class="ellipsis">{{ .Mode }}</div>
+        </r-cell>
+        <r-cell span="2">
+          <div align="right" class="ellipsis">{{ .Size }}</div>
+        </r-cell>
+        {{ end }}
+      </r-grid>
     </div>
   </div>
 </body>
