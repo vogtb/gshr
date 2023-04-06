@@ -1,9 +1,5 @@
 # Copyright 2023 Ben Vogt. All rights reserved.
 
-PWD := $(shell pwd)
-
-rfind=$(shell find $1 -type f -not -path "./target/*")
-
 target:
 	mkdir -p target
 

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  {{ template "head" .RepoData.BaseURL }}
+  {{ template "head" .RepoData.HeadData }}
 </head>
 
 <body>
@@ -14,7 +14,7 @@
           <tr>
             <td><b>commit: </b></td>
             <td>
-              <a href="{{ .RepoData.BaseURL }}{{ .RepoData.Name }}/commit/{{ .Hash }}/">
+              <a href="{{ .RepoData.HeadData.BaseURL }}{{ .RepoData.Name }}/commit/{{ .Hash }}/">
                 {{ .Hash }}
               </a>
             </td>

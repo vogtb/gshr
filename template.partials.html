@@ -3,13 +3,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>gshr</title>
-<link rel="stylesheet" href="{{ . }}gshr.css" type="text/css">
-<meta name="description"
-      content="git static host repo">
-<meta property="og:site_name" content="gshr">
-<meta property="og:type" content="article">
-<meta property="article:author" content="gshr">
+<link rel="stylesheet" href="{{ .BaseURL }}gshr.css" type="text/css">
+<meta name="description" content="git static host repo">
+<title>{{ .SiteName }}</title>
 {{ end }}
 
 {{ define "metadata" }}
@@ -18,7 +14,7 @@
     <tbody>
       <tr>
         <td>
-          <a href="{{ .BaseURL }}">
+          <a href="{{ .HeadData.BaseURL }}">
             <span>
               ←
               Back to main page
@@ -39,7 +35,7 @@
       </tr>
       <tr>
         <td>
-          git clone {{ .BaseURL }}{{ .Name }}.git
+          git clone {{ .HeadData.BaseURL }}{{ .Name }}.git
         </td>
       </tr>
       {{ if not (eq .PublishedGitURL "") }}
@@ -51,18 +47,18 @@
       {{ end }}
       <tr>
         <td>
-          <a href="{{ .BaseURL }}{{ .Name }}/log.html">Log</a>
+          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/log.html">Log</a>
           |
-          <a href="{{ .BaseURL }}{{ .Name }}/files.html">Files</a>
+          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files.html">Files</a>
           {{ if not (eq .ReadMePath "") }}
           |
-          <a href="{{ .BaseURL }}{{ .Name }}/files/{{ .ReadMePath }}/index.html">
+          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .ReadMePath }}/index.html">
             {{ .ReadMePath }}
           </a>
           {{ end }}
           {{ if not (eq .LicenseFilePath "") }}
           |
-          <a href="{{ .BaseURL }}{{ .Name }}/files/{{ .LicenseFilePath }}/index.html">
+          <a href="{{ .HeadData.BaseURL }}{{ .Name }}/files/{{ .LicenseFilePath }}/index.html">
             {{ .LicenseFilePath }}
           </a>
           {{ end }}

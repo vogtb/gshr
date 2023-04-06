@@ -100,6 +100,10 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 		Repo:            repo,
 		PublishedGitURL: repo.PublishedGitURL,
 		BaseURL:         config.BaseURL,
+		HeadData: HeadData{
+			BaseURL:  config.BaseURL,
+			SiteName: config.SiteName,
+		},
 		ReadMePath:      repo.FindFileInRoot(settings.AllowedReadMeFiles),
 		LicenseFilePath: repo.FindFileInRoot(settings.AllowedLicenseFiles),
 	}

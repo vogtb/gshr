@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  {{ template "head" .RepoData.BaseURL }}
+  {{ template "head" .RepoData.HeadData }}
 </head>
 
 <body>
@@ -22,7 +22,8 @@
           <tr>
             <td>{{ .Mode }}</td>
             <td>
-              <a href="{{ $.RepoData.BaseURL }}{{ $.RepoData.Name }}/files/{{ .Name }}/index.html">
+              <a
+                 href="{{ $.RepoData.HeadData.BaseURL }}{{ $.RepoData.Name }}/files/{{ .Name }}/index.html">
                 {{ .Name }}
               </a>
             </td>

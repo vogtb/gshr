@@ -50,6 +50,12 @@ type RepoData struct {
 	Repo
 	PublishedGitURL string
 	BaseURL         string
+	HeadData        HeadData
 	ReadMePath      string
 	LicenseFilePath string
+}
+
+type HeadData struct {
+	BaseURL  string
+	SiteName string
 }
