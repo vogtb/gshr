@@ -44,10 +44,6 @@ body {
   -moz-osx-font-smoothing: auto;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
-  -moz-font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
-  -o-font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
-  -webkit-font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
-  font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "frac" 0;
 }
 
 pre,

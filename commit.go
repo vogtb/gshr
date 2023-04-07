@@ -52,7 +52,6 @@ func RenderAllCommitPages(data RepoData, r *git.Repository) {
 		filesChangedMap := make(map[string]bool)
 		filesChanged := []string{}
 		if parent != nil {
-
 			patch, err := parent.Patch(c)
 			checkErr(err)
 			patchString := patch.String()
