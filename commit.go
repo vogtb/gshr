@@ -53,7 +53,7 @@ func RenderAllCommitPages(data RepoData, r *git.Repository) {
 		filesChanged := []string{}
 		if parent != nil {
 
-			patch, err := c.Patch(parent)
+			patch, err := parent.Patch(c)
 			checkErr(err)
 			patchString := patch.String()
 			highlighted := highlight("x.diff", &patchString)
