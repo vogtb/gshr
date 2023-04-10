@@ -37,8 +37,8 @@
           <r-cell span="7">
             <div class="ellipsis">
               {{ if .HostGit }}
-              <a class="mono" href="{{ .BaseURL }}{{ .Name }}.git">
-                {{ .BaseURL }}{{ .Name }}.git
+              <a class="mono" href="{{ .BaseURL }}git/{{ .Name }}">
+                {{ .BaseURL }}git/{{ .Name }}
               </a>
               {{ else if not (eq .PublishedGitURL "") }}
               <a class="mono" href="{{ .PublishedGitURL }}">

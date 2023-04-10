@@ -46,15 +46,15 @@ func main() {
 		RenderSingleFilePages(data)
 	}
 	RenderIndexPage(allRepoData)
-	RenderAssets()
+	renderAssets()
 	for _, repo := range config.Repos {
-		HostRepo(repo)
+		hostRepo(repo)
 	}
 }
 
 func Init() {
 	log.SetFlags(0)
-	log.SetOutput(new(LogWriter))
+	log.SetOutput(new(logger))
 	args = DefaultCmdArgs()
 	settings = DefaultSettings()
 	pwd, err := os.Getwd()
@@ -111,33 +111,38 @@ func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
 	return data
 }
 
-func RenderAssets() {
+func renderAssets() {
 	debug("rendering gshr.css")
 	debug("rendering favicon.ico")
 	checkErr(os.WriteFile(path.Join(args.OutputDir, "gshr.css"), css, 0666))
 	checkErr(os.WriteFile(path.Join(args.OutputDir, "favicon.ico"), favicon, 0666))
 }
 
-func HostRepo(data Repo) {
+func hostRepo(data Repo) {
 	if data.HostGit {
 		debug("hosting of '%v' is ON", data.Name)
 		old := path.Join(data.CloneDir(), ".git")
-		new := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
-		debug("renaming '%v', new %v", data.Name, new)
-		checkErr(os.Rename(old, new))
-		debug("running 'git update-server-info' in %v", new)
+		renamed := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
+		repoFiles := path.Join(args.OutputDir, data.Name, "git")
+		final := path.Join(args.OutputDir, "git", data.Name)
+		debug("renaming '%v', new %v", data.Name, renamed)
+		os.MkdirAll(path.Join(args.OutputDir, "git"), 0777)
+		checkErr(os.Rename(old, renamed))
+		debug("running 'git update-server-info' in %v", renamed)
 		cmd := exec.Command("git", "update-server-info")
-		cmd.Dir = new
+		cmd.Dir = renamed
 		checkErr(cmd.Run())
-		debug("hosting '%v' at %v", data.Name, new)
+		os.RemoveAll(repoFiles)
+		checkErr(os.Rename(renamed, final))
+		debug("hosting '%v' at %v", data.Name, final)
 	} else {
 		debug("hosting of '%v' is OFF", data.Name)
 	}
 }
 
-type LogWriter struct{}
+type logger struct{}
 
-func (writer LogWriter) Write(bytes []byte) (int, error) {
+func (writer logger) Write(bytes []byte) (int, error) {
 	return fmt.Print(string(bytes))
 }
 
