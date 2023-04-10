@@ -22,7 +22,7 @@ type FilesPage struct {
 	Files    []FileOverview
 }
 
-func (f *FilesPage) RenderPage(t *template.Template) {
+func (f *FilesPage) renderPage(t *template.Template) {
 	debug("file page for '%v'", f.RepoData.Name)
 	output, err := os.Create(path.Join(args.OutputDir, f.RepoData.Name, "files.html"))
 	checkErr(err)
@@ -59,5 +59,5 @@ func renderAllFilesPage(data repoData) {
 		RepoData: data,
 		Files:    files,
 	}
-	index.RenderPage(t)
+	index.renderPage(t)
 }

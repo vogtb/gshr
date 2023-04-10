@@ -7,7 +7,7 @@ target/output: target
 	mkdir -p target/output
 
 clean:
-	rm -rf target/*
+	rm -rf target
 
 deps:
 	go mod download

@@ -59,10 +59,11 @@ func renderAllCommitPages(data repoData, r *git.Repository) {
 			//       usage, but something tells me no. Fixing it by shelling out for now, since we
 			//       require git to be installed for `git update-server-info` anyway.
 			cmd := exec.Command("git", "diff", parent.Hash.String(), c.Hash.String())
-			cmd.Dir = path.Join(args.OutputDir, data.Name)
+			cmd.Dir = path.Join(args.OutputDir, data.Name, "git")
 			var out strings.Builder
 			cmd.Stdout = &out
-			checkErr(cmd.Run())
+			err = cmd.Run()
+			checkErr(err)
 			patchString := out.String()
 			highlighted := highlight("x.diff", &patchString)
 			diffContent = template.HTML(highlighted)
