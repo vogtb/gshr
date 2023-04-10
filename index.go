@@ -8,7 +8,7 @@ import (
 
 type IndexPage struct {
 	HeadData HeadData
-	Repos    []RepoData
+	Repos    []repoData
 }
 
 func (l *IndexPage) RenderPage(t *template.Template) {
@@ -19,13 +19,13 @@ func (l *IndexPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderIndexPage(repos []RepoData) {
+func RenderIndexPage(repos []repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.index.html", "template.partials.html")
 	checkErr(err)
 	(&IndexPage{
 		HeadData: HeadData{
-			BaseURL:  config.BaseURL,
-			SiteName: config.SiteName,
+			BaseURL:  conf.Site.BaseURL,
+			SiteName: conf.Site.Name,
 		},
 		Repos: repos,
 	}).RenderPage(t)

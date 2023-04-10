@@ -1,9 +1,9 @@
+[site]
 base_url = "http://localhost/"
-site_name = "example of a couple go repos on github"
+name = "example of a couple go repos on github"
 
 [[repos]]
 name = "go-git"
 description = "A highly extensible Git implementation in pure Go."
 url = "https://github.com/go-git/go-git"
-published_git_url = "https://github.com/go-git/go-git"
-host_git = true
+alt_link = "https://github.com/go-git/go-git"

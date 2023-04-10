@@ -32,10 +32,10 @@
         git clone {{ .HeadData.BaseURL }}{{ .Name }}.git
       </div>
     </r-cell>
-    {{ if not (eq .PublishedGitURL "") }}
+    {{ if not (eq .AltLink "") }}
     <r-cell span="12">
       <div class="ellipsis">
-        alt url: <a href="{{ .PublishedGitURL }}">{{ .PublishedGitURL }}</a>
+        alt url: <a href="{{ .AltLink }}">{{ .AltLink }}</a>
       </div>
     </r-cell>
     {{ end }}

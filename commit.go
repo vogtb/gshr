@@ -13,7 +13,7 @@ import (
 )
 
 type CommitPage struct {
-	RepoData        RepoData
+	RepoData        repoData
 	Author          string
 	AuthorEmail     string
 	Date            string
@@ -36,7 +36,7 @@ func (c *CommitPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderAllCommitPages(data RepoData, r *git.Repository) {
+func RenderAllCommitPages(data repoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "template.commit.html", "template.partials.html")
 	checkErr(err)
 	ref, err := r.Head()

@@ -18,7 +18,7 @@ type FileOverview struct {
 }
 
 type FilesPage struct {
-	RepoData RepoData
+	RepoData repoData
 	Files    []FileOverview
 }
 
@@ -30,11 +30,11 @@ func (f *FilesPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderAllFilesPage(data RepoData) {
+func RenderAllFilesPage(data repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.files.html", "template.partials.html")
 	checkErr(err)
 	files := make([]FileOverview, 0)
-	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(data.cloneDir(), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
@@ -42,7 +42,7 @@ func RenderAllFilesPage(data RepoData) {
 		if !info.IsDir() {
 			info, err := os.Stat(filename)
 			checkErr(err)
-			Name, _ := strings.CutPrefix(filename, data.CloneDir())
+			Name, _ := strings.CutPrefix(filename, data.cloneDir())
 			Name, _ = strings.CutPrefix(Name, "/")
 			tf := FileOverview{
 				Origin: filename,

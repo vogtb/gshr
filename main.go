@@ -27,17 +27,17 @@ var css []byte
 //go:embed favicon.ico
 var favicon []byte
 
-var args CmdArgs
+var args cmArgs
 
-var config Config
+var conf config
 
-var settings Settings
+var stt settings
 
 func main() {
 	var r *git.Repository = &git.Repository{}
 	Init()
-	allRepoData := []RepoData{}
-	for _, repo := range config.Repos {
+	allRepoData := []repoData{}
+	for _, repo := range conf.Repos {
 		data := CloneAndGetData(repo, r)
 		allRepoData = append(allRepoData, data)
 		RenderLogPage(data, r)
@@ -47,7 +47,7 @@ func main() {
 	}
 	RenderIndexPage(allRepoData)
 	renderAssets()
-	for _, repo := range config.Repos {
+	for _, repo := range conf.Repos {
 		hostRepo(repo)
 	}
 }
@@ -56,7 +56,7 @@ func Init() {
 	log.SetFlags(0)
 	log.SetOutput(new(logger))
 	args = DefaultCmdArgs()
-	settings = DefaultSettings()
+	stt = DefaultSettings()
 	pwd, err := os.Getwd()
 	checkErr(err)
 	args.Wd = pwd
@@ -81,31 +81,31 @@ func Init() {
 	configFileBytes, err := os.ReadFile(args.ConfigPath)
 	configString := string(configFileBytes)
 	checkErr(err)
-	config = ParseConfiguration(configString)
-	debug("base_url '%v'", config.BaseURL)
-	debug("site_name '%v'", config.SiteName)
+	conf = parseConfig(configString)
+	debug("base_url '%v'", conf.Site.BaseURL)
+	debug("site_name '%v'", conf.Site.Name)
 }
 
-func CloneAndGetData(repo Repo, r *git.Repository) RepoData {
-	err := os.MkdirAll(repo.CloneDir(), 0755)
+func CloneAndGetData(repo repoConfig, r *git.Repository) repoData {
+	err := os.MkdirAll(repo.cloneDir(), 0755)
 	checkErr(err)
 	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
 	checkErr(err)
 	debug("cloning '%v'", repo.Name)
-	repoRef, err := git.PlainClone(repo.CloneDir(), false, &git.CloneOptions{
+	repoRef, err := git.PlainClone(repo.cloneDir(), false, &git.CloneOptions{
 		URL: repo.URL,
 	})
 	checkErr(err)
-	data := RepoData{
-		Repo:            repo,
-		PublishedGitURL: repo.PublishedGitURL,
-		BaseURL:         config.BaseURL,
+	data := repoData{
+		repoConfig: repo,
+		AltLink:    repo.AltLink,
+		BaseURL:    conf.Site.BaseURL,
 		HeadData: HeadData{
-			BaseURL:  config.BaseURL,
-			SiteName: config.SiteName,
+			BaseURL:  conf.Site.BaseURL,
+			SiteName: conf.Site.Name,
 		},
-		ReadMePath:      repo.FindFileInRoot(settings.AllowedReadMeFiles),
-		LicenseFilePath: repo.FindFileInRoot(settings.AllowedLicenseFiles),
+		ReadMePath:      repo.findFileInRoot(stt.AllowedReadMeFiles),
+		LicenseFilePath: repo.findFileInRoot(stt.AllowedLicenseFiles),
 	}
 	*r = *repoRef
 	return data
@@ -118,26 +118,20 @@ func renderAssets() {
 	checkErr(os.WriteFile(path.Join(args.OutputDir, "favicon.ico"), favicon, 0666))
 }
 
-func hostRepo(data Repo) {
-	if data.HostGit {
-		debug("hosting of '%v' is ON", data.Name)
-		old := path.Join(data.CloneDir(), ".git")
-		renamed := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
-		repoFiles := path.Join(args.OutputDir, data.Name, "git")
-		final := path.Join(args.OutputDir, "git", data.Name)
-		debug("renaming '%v', new %v", data.Name, renamed)
-		os.MkdirAll(path.Join(args.OutputDir, "git"), 0777)
-		checkErr(os.Rename(old, renamed))
-		debug("running 'git update-server-info' in %v", renamed)
-		cmd := exec.Command("git", "update-server-info")
-		cmd.Dir = renamed
-		checkErr(cmd.Run())
-		os.RemoveAll(repoFiles)
-		checkErr(os.Rename(renamed, final))
-		debug("hosting '%v' at %v", data.Name, final)
-	} else {
-		debug("hosting of '%v' is OFF", data.Name)
-	}
+func hostRepo(data repoConfig) {
+	debug("hosting '%v'", data.Name)
+	old := path.Join(data.cloneDir(), ".git")
+	renamed := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
+	repoFiles := path.Join(args.OutputDir, data.Name, "git")
+	final := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
+	debug("renaming '%v', new %v", data.Name, renamed)
+	checkErr(os.Rename(old, renamed))
+	debug("running 'git update-server-info' in %v", renamed)
+	cmd := exec.Command("git", "update-server-info")
+	cmd.Dir = renamed
+	checkErr(cmd.Run())
+	os.RemoveAll(repoFiles)
+	debug("hosting '%v' at %v", data.Name, final)
 }
 
 type logger struct{}
@@ -190,30 +184,30 @@ func highlight(pathOrExtension string, data *string) string {
 	return buf.String()
 }
 
-type CmdArgs struct {
+type cmArgs struct {
 	Silent     bool
 	Wd         string
 	ConfigPath string
 	OutputDir  string
 }
 
-func DefaultCmdArgs() CmdArgs {
-	return CmdArgs{
+func DefaultCmdArgs() cmArgs {
+	return cmArgs{
 		Silent:     true,
 		ConfigPath: "",
 		OutputDir:  "",
 	}
 }
 
-type Settings struct {
+type settings struct {
 	TextExtensions      map[string]bool
 	PlainFiles          map[string]bool
 	AllowedLicenseFiles map[string]bool
 	AllowedReadMeFiles  map[string]bool
 }
 
-func DefaultSettings() Settings {
-	return Settings{
+func DefaultSettings() settings {
+	return settings{
 		TextExtensions: map[string]bool{
 			".c":              true,
 			".cc":             true,

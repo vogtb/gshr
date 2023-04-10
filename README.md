@@ -10,7 +10,7 @@ directory for multiple repos, with...
 * Individual commit page summarizing commit including diff.
 * File list page for each repo for the current HEAD ref.
 * File detail/preview page for each file in current HEAD ref.
-* Statically clone-able git folder for each repo.
+* Statically clone-able git dir for each repo.
 
 ---
 
@@ -45,27 +45,27 @@ Usage of gshr:
 
 The toml file needs to be in the format:
 
-* `base_url`: Base url for the site. Eg: `"/"` or `"https://mysite.com/git/"`.  
-* `site_name`: Site name displayed on the main index.html page that lists all repos.
+* `site`: Site-level configuration.
+  * `base_url`: Base url for the site. Eg: `"/"` or `"https://mysite.com/code/"`.
+  * `name`: Site name displayed on the main index.html page that lists all repos.
 * `repos` List of data for each repo.
   * `name`: Name of repo to be used in display, paths.
   * `description`: Description of repo used in html pages.
   * `url`: Absolute, relative, or remote. eg: `/home/repo`, `./repo`, `git://`, `http://`.
-  * `published_git_url`: Optional Link to where the repo lives. Eg: `github.com/vogtb/gshr`.
-  * `host_git`: Bool of whether we should package the repo up into `{name}.git` and host it.
+  * `alt_link`: Optional Link to where the repo lives. Eg: `github.com/vogtb/gshr`.
 
-For example:
+Example:
 
 ```toml
+[site]
 base_url = "http://localhost/"
-site_name = "public, self hosted git repositories"
+name = "development site - should run on port 80"
 
 [[repos]]
 name = "gshr"
 description = "git static host repo -- generates static html for repos"
 url = "https://github.com/vogtb/gshr"
-published_git_url = "https://github.com/vogtb/gshr"
-host_git = true
+alt_link = "https://github.com/vogtb/gshr"
 ```
 
 ---

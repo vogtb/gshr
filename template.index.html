@@ -36,17 +36,9 @@
           </r-cell>
           <r-cell span="7">
             <div class="ellipsis">
-              {{ if .HostGit }}
-              <a class="mono" href="{{ .BaseURL }}git/{{ .Name }}">
-                {{ .BaseURL }}git/{{ .Name }}
+              <a class="mono" href="{{ .BaseURL }}git/{{ .Name }}.git">
+                {{ .BaseURL }}/{{ .Name }}.git
               </a>
-              {{ else if not (eq .PublishedGitURL "") }}
-              <a class="mono" href="{{ .PublishedGitURL }}">
-                {{ .PublishedGitURL }}
-              </a>
-              {{ else }}
-              <em>none</em>
-              {{ end }}
             </div>
           </r-cell>
           {{ end }}

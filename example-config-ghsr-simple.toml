@@ -1,9 +1,9 @@
+[site]
 base_url = "http://localhost/"
-site_name = "public, self hosted git repositories"
+name = "public, self hosted git repositories"
 
 [[repos]]
 name = "gshr"
 description = "git static host repo -- generates static html for repos"
 url = "https://github.com/vogtb/gshr"
-published_git_url = "https://github.com/vogtb/gshr"
-host_git = true
+alt_link = "https://github.com/vogtb/gshr"

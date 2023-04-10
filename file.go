@@ -11,7 +11,7 @@ import (
 )
 
 type FilePage struct {
-	RepoData       RepoData
+	RepoData       repoData
 	Mode           string
 	Name           string
 	Size           string
@@ -35,20 +35,20 @@ func (f *FilePage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderSingleFilePages(data RepoData) {
+func RenderSingleFilePages(data repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.file.html", "template.partials.html")
 	checkErr(err)
-	err = filepath.Walk(data.CloneDir(), func(filename string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(data.cloneDir(), func(filename string, info fs.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
 
 		if !info.IsDir() {
 			ext := filepath.Ext(filename)
-			_, canRenderExtension := settings.TextExtensions[ext]
-			_, canRenderByFullName := settings.PlainFiles[filepath.Base(filename)]
+			_, canRenderExtension := stt.TextExtensions[ext]
+			_, canRenderByFullName := stt.PlainFiles[filepath.Base(filename)]
 			canRender := canRenderExtension || canRenderByFullName
-			partialPath, _ := strings.CutPrefix(filename, data.CloneDir())
+			partialPath, _ := strings.CutPrefix(filename, data.cloneDir())
 			destDir := path.Join(args.OutputDir, data.Name, "files", partialPath)
 			outputName := path.Join(args.OutputDir, data.Name, "files", partialPath, "index.html")
 			var content template.HTML

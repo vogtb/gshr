@@ -20,7 +20,7 @@ type LogPageCommit struct {
 }
 
 type LogPage struct {
-	RepoData   RepoData
+	RepoData   repoData
 	HasReadMe  bool
 	ReadMePath string
 	Commits    []LogPageCommit
@@ -34,7 +34,7 @@ func (l *LogPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderLogPage(data RepoData, r *git.Repository) {
+func RenderLogPage(data repoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "template.log.html", "template.partials.html")
 	checkErr(err)
 	commits := make([]LogPageCommit, 0)
