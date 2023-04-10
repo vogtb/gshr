@@ -4,7 +4,9 @@ import (
 	"errors"
 	"html/template"
 	"os"
+	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -53,11 +55,20 @@ func RenderAllCommitPages(data RepoData, r *git.Repository) {
 		filesChanged := []string{}
 		if parent != nil {
 			patch, err := parent.Patch(c)
-			checkErr(err)
-			patchString := patch.String()
+			// NOTE: Seems to be a bug in go-git that gives us diff patches that are wrong. Could be my
+			//       usage, but something tells me no. Fixing it by shelling out for now, since we
+			//       require git to be installed for `git update-server-info` anyway.
+			cmd := exec.Command("git", "diff", parent.Hash.String(), c.Hash.String())
+			cmd.Dir = path.Join(args.OutputDir, data.Name)
+			var out strings.Builder
+			cmd.Stdout = &out
+			checkErr(cmd.Run())
+			patchString := out.String()
 			highlighted := highlight("x.diff", &patchString)
-			checkErr(err)
 			diffContent = template.HTML(highlighted)
+			checkErr(err)
+			patch, err = parent.Patch(c)
+			checkErr(err)
 			for _, fp := range patch.FilePatches() {
 				from, to := fp.Files()
 				if from != nil {
