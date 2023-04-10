@@ -30,7 +30,7 @@ func (f *FilesPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderAllFilesPage(data repoData) {
+func renderAllFilesPage(data repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.files.html", "template.partials.html")
 	checkErr(err)
 	files := make([]FileOverview, 0)

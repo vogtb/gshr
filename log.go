@@ -34,7 +34,7 @@ func (l *LogPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderLogPage(data repoData, r *git.Repository) {
+func renderLogPage(data repoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "template.log.html", "template.partials.html")
 	checkErr(err)
 	commits := make([]LogPageCommit, 0)

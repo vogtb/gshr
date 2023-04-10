@@ -22,6 +22,7 @@ func (c *config) validate() {
 		if duplicate {
 			checkErr(errors.New(fmt.Sprintf("duplicate repo name: '%s'", r.Name)))
 		}
+		r.validate()
 		names[r.Name] = true
 	}
 }

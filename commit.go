@@ -12,7 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-type CommitPage struct {
+type commitPage struct {
 	RepoData        repoData
 	Author          string
 	AuthorEmail     string
@@ -26,7 +26,7 @@ type CommitPage struct {
 	DiffContent     template.HTML
 }
 
-func (c *CommitPage) RenderPage(t *template.Template) {
+func (c *commitPage) renderPage(t *template.Template) {
 	debug("commit %v %v", c.RepoData.Name, c.Hash)
 	err := os.MkdirAll(path.Join(args.OutputDir, c.RepoData.Name, "commit", c.Hash), 0755)
 	checkErr(err)
@@ -36,7 +36,7 @@ func (c *CommitPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderAllCommitPages(data repoData, r *git.Repository) {
+func renderAllCommitPages(data repoData, r *git.Repository) {
 	t, err := template.ParseFS(htmlTemplates, "template.commit.html", "template.partials.html")
 	checkErr(err)
 	ref, err := r.Head()
@@ -96,7 +96,7 @@ func RenderAllCommitPages(data repoData, r *git.Repository) {
 			deleted += stat.Deletion
 		}
 		checkErr(err)
-		(&CommitPage{
+		(&commitPage{
 			RepoData:        data,
 			Author:          c.Author.Name,
 			AuthorEmail:     c.Author.Email,
@@ -108,7 +108,7 @@ func RenderAllCommitPages(data repoData, r *git.Repository) {
 			LinesDeleted:    deleted,
 			FilesChanged:    filesChanged,
 			DiffContent:     diffContent,
-		}).RenderPage(t)
+		}).renderPage(t)
 		return nil
 	})
 	checkErr(err)

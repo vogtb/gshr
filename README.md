@@ -73,18 +73,20 @@ alt_link = "https://github.com/vogtb/gshr"
 ## Output
 
 ```text
-{output_dir}
+{output_dir}/
   index.html
-  {repo_name}
+  {repo_name}/
     log.html
-    commits
+    commits/
       {hash}/commit.html
     files.html
-    files
+    files/
       {full_file_name}/file.html
+  {repo_name}.git
+      {...raw git file data}
 ```
 
-For example:
+Example:
 
 ```text
 output
@@ -118,6 +120,25 @@ output
 │   ├── files.html
 │   └── log.html
 ├── gshr.css
+├── gshr.git
+│   ├── HEAD
+│   ├── config
+│   ├── index
+│   ├── info
+│   │   └── refs
+│   ├── objects
+│   │   ├── info
+│   │   │   └── packs
+│   │   └── pack
+│   │       ├── pack-a6e75f15316a2d809290159b8bdc88303c8090cb.idx
+│   │       └── pack-a6e75f15316a2d809290159b8bdc88303c8090cb.pack
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       └── main
+│       └── tags
 └── index.html
 ```
 

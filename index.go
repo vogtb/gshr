@@ -11,7 +11,7 @@ type IndexPage struct {
 	Repos    []repoData
 }
 
-func (l *IndexPage) RenderPage(t *template.Template) {
+func (l *IndexPage) renderPage(t *template.Template) {
 	debug("index for '%v'", l.HeadData.SiteName)
 	output, err := os.Create(path.Join(args.OutputDir, "index.html"))
 	checkErr(err)
@@ -19,7 +19,7 @@ func (l *IndexPage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderIndexPage(repos []repoData) {
+func renderIndexPage(repos []repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.index.html", "template.partials.html")
 	checkErr(err)
 	(&IndexPage{
@@ -28,5 +28,5 @@ func RenderIndexPage(repos []repoData) {
 			SiteName: conf.Site.Name,
 		},
 		Repos: repos,
-	}).RenderPage(t)
+	}).renderPage(t)
 }

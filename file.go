@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type FilePage struct {
+type filePage struct {
 	RepoData       repoData
 	Mode           string
 	Name           string
@@ -23,7 +23,7 @@ type FilePage struct {
 	Content        template.HTML
 }
 
-func (f *FilePage) RenderPage(t *template.Template) {
+func (f *filePage) renderPage(t *template.Template) {
 	debug("file %v %v", f.RepoData.Name, f.Name)
 	err := os.MkdirAll(f.DestinationDir, 0777)
 	checkErr(err)
@@ -35,7 +35,7 @@ func (f *FilePage) RenderPage(t *template.Template) {
 	checkErr(err)
 }
 
-func RenderSingleFilePages(data repoData) {
+func renderIndividualFilePages(data repoData) {
 	t, err := template.ParseFS(htmlTemplates, "template.file.html", "template.partials.html")
 	checkErr(err)
 	err = filepath.Walk(data.cloneDir(), func(filename string, info fs.FileInfo, err error) error {
@@ -62,7 +62,7 @@ func RenderSingleFilePages(data repoData) {
 				checkErr(err)
 				content = template.HTML(highlighted)
 			}
-			(&FilePage{
+			(&filePage{
 				RepoData:       data,
 				Mode:           info.Mode().String(),
 				Size:           fmt.Sprintf("%v", info.Size()),
@@ -73,7 +73,7 @@ func RenderSingleFilePages(data repoData) {
 				Destination:    outputName,
 				DestinationDir: destDir,
 				Content:        content,
-			}).RenderPage(t)
+			}).renderPage(t)
 		}
 		return nil
 	})

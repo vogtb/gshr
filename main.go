@@ -27,7 +27,7 @@ var css []byte
 //go:embed favicon.ico
 var favicon []byte
 
-var args cmArgs
+var args cmdArgs
 
 var conf config
 
@@ -35,28 +35,28 @@ var stt settings
 
 func main() {
 	var r *git.Repository = &git.Repository{}
-	Init()
+	initialize()
 	allRepoData := []repoData{}
 	for _, repo := range conf.Repos {
-		data := CloneAndGetData(repo, r)
+		data := cloneAndGetData(repo, r)
 		allRepoData = append(allRepoData, data)
-		RenderLogPage(data, r)
-		RenderAllCommitPages(data, r)
-		RenderAllFilesPage(data)
-		RenderSingleFilePages(data)
+		renderLogPage(data, r)
+		renderAllCommitPages(data, r)
+		renderAllFilesPage(data)
+		renderIndividualFilePages(data)
 	}
-	RenderIndexPage(allRepoData)
+	renderIndexPage(allRepoData)
 	renderAssets()
 	for _, repo := range conf.Repos {
 		hostRepo(repo)
 	}
 }
 
-func Init() {
+func initialize() {
 	log.SetFlags(0)
 	log.SetOutput(new(logger))
-	args = DefaultCmdArgs()
-	stt = DefaultSettings()
+	args = defaultCmdArgs()
+	stt = defaultSettings()
 	pwd, err := os.Getwd()
 	checkErr(err)
 	args.Wd = pwd
@@ -84,9 +84,10 @@ func Init() {
 	conf = parseConfig(configString)
 	debug("base_url '%v'", conf.Site.BaseURL)
 	debug("site_name '%v'", conf.Site.Name)
+	conf.validate()
 }
 
-func CloneAndGetData(repo repoConfig, r *git.Repository) repoData {
+func cloneAndGetData(repo repoConfig, r *git.Repository) repoData {
 	err := os.MkdirAll(repo.cloneDir(), 0755)
 	checkErr(err)
 	err = os.MkdirAll(path.Join(args.OutputDir, repo.Name), 0755)
@@ -124,7 +125,7 @@ func hostRepo(data repoConfig) {
 	renamed := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
 	repoFiles := path.Join(args.OutputDir, data.Name, "git")
 	final := path.Join(args.OutputDir, fmt.Sprintf("%v.git", data.Name))
-	debug("renaming '%v', new %v", data.Name, renamed)
+	debug("renaming '%v' to %v", data.Name, renamed)
 	checkErr(os.Rename(old, renamed))
 	debug("running 'git update-server-info' in %v", renamed)
 	cmd := exec.Command("git", "update-server-info")
@@ -184,15 +185,15 @@ func highlight(pathOrExtension string, data *string) string {
 	return buf.String()
 }
 
-type cmArgs struct {
+type cmdArgs struct {
 	Silent     bool
 	Wd         string
 	ConfigPath string
 	OutputDir  string
 }
 
-func DefaultCmdArgs() cmArgs {
-	return cmArgs{
+func defaultCmdArgs() cmdArgs {
+	return cmdArgs{
 		Silent:     true,
 		ConfigPath: "",
 		OutputDir:  "",
@@ -206,7 +207,7 @@ type settings struct {
 	AllowedReadMeFiles  map[string]bool
 }
 
-func DefaultSettings() settings {
+func defaultSettings() settings {
 	return settings{
 		TextExtensions: map[string]bool{
 			".c":              true,
