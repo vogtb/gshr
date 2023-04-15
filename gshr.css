@@ -1,6 +1,6 @@
 :root {
   /* Fonts */
-  --mono-font: monospace;
+  --mono-font: "Menlo", monospace;
   --sans-font: -apple-system, BlinkMacSystemFont, "avenir next", avenir,
     helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial,
     sans-serif;
