@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
@@ -104,6 +105,7 @@ func cloneAndGetData(repo repoConfig, r *git.Repository) repoData {
 		HeadData: HeadData{
 			BaseURL:  conf.Site.BaseURL,
 			SiteName: conf.Site.Name,
+			GenTime:  args.GenTime,
 		},
 		ReadMePath:      repo.findFileInRoot(stt.AllowedReadMeFiles),
 		LicenseFilePath: repo.findFileInRoot(stt.AllowedLicenseFiles),
@@ -190,6 +192,7 @@ type cmdArgs struct {
 	Wd         string
 	ConfigPath string
 	OutputDir  string
+	GenTime    string
 }
 
 func defaultCmdArgs() cmdArgs {
@@ -197,6 +200,7 @@ func defaultCmdArgs() cmdArgs {
 		Silent:     true,
 		ConfigPath: "",
 		OutputDir:  "",
+		GenTime:    time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
 	}
 }
 

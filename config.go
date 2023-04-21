@@ -85,6 +85,7 @@ type repoData struct {
 }
 
 type HeadData struct {
+	GenTime  string
 	BaseURL  string
 	SiteName string
 }

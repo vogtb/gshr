@@ -26,6 +26,7 @@ func renderIndexPage(repos []repoData) {
 		HeadData: HeadData{
 			BaseURL:  conf.Site.BaseURL,
 			SiteName: conf.Site.Name,
+			GenTime:  args.GenTime,
 		},
 		Repos: repos,
 	}).renderPage(t)
